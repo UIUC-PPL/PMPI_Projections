@@ -10,7 +10,8 @@
 
 #define MPI_Send_user_event 0
 #define MPI_Recv_user_event 1
-
+#define MPI_Init_user_event 2
+#define MPI_Finalize_user_event 3
 
 long records_since_flush = 0;
 char *out_buf;
@@ -27,7 +28,7 @@ int rank;
 int np;
 
 void init_time(){
-	initTime = MPI_Wtime();
+	initTime = MPI_Wtime() - 0.5;
 }
 
 long time_us(){
@@ -46,7 +47,7 @@ void writeSts(){
 	stsfile << "TOTAL_EPS 2\n";
 	stsfile << "TOTAL_MSGS 2\n";
 	stsfile << "TOTAL_PSEUDOS 0\n";
-	stsfile << "TOTAL_EVENTS 2\n";
+	stsfile << "TOTAL_EVENTS 4\n";
 	stsfile << "CHARE 0 chare2\n";
 	stsfile << "CHARE 1 chare1\n";
 	stsfile << "ENTRY CHARE 0 entry1 0 0\n";
@@ -55,6 +56,8 @@ void writeSts(){
 	stsfile << "MESSAGE 1 0\n";
 	stsfile << "EVENT " << MPI_Send_user_event  << " MPI_Send\n";
 	stsfile << "EVENT " << MPI_Recv_user_event  << " MPI_Recv\n";
+	stsfile << "EVENT " << MPI_Init_user_event  << " MPI_Init\n";
+	stsfile << "EVENT " << MPI_Finalize_user_event  << " MPI_Finalize\n";
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";
 	
@@ -100,9 +103,20 @@ void write_USER_EVENT_PAIR(int userEventID, long startTime){
 	sprintf(curr_buf_position, "100 %d %ld %d %d\n100 %d %ld %d %d\n", userEventID, startTime, event, pe, userEventID, endTime, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
+	records_since_flush ++;
 	flush();
 }
 
+/// Write out a user event
+void write_USER_EVENT(int userEventID){
+	long time = time_us();
+	int event = 0;
+	int pe = rank;
+	sprintf(curr_buf_position, "13 %d %ld %d %d\n", userEventID, time, event, pe);
+	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+}
 
 void write_BEGIN_PROCESSING(){
 	
@@ -199,10 +213,13 @@ int MPI_Init(int * p1, char *** p2){
 	write_log_header();
 	
 	write_BEGIN_PROCESSING();
+	write_USER_EVENT(MPI_Init_user_event);
+	
 	return ret;
 }
 
 int MPI_Finalize(void){
+	write_USER_EVENT(MPI_Finalize_user_event);
 	write_END_PROCESSING();
 
 	write_log_footer();
