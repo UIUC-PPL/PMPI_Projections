@@ -8,6 +8,10 @@
 
 #define OUTBUFSIZE 1024*1024*4
 
+#define MPI_Send_user_event 0
+#define MPI_Recv_user_event 1
+
+
 long records_since_flush = 0;
 char *out_buf;
 char *curr_buf_position;
@@ -49,8 +53,8 @@ void writeSts(){
 	stsfile << "ENTRY CHARE 1 entry2 1 1\n";
 	stsfile << "MESSAGE 0 0\n";
 	stsfile << "MESSAGE 1 0\n";
-	stsfile << "EVENT 0 UserEvent0\n";
-	stsfile << "EVENT 1 UserEvent1\n";
+	stsfile << "EVENT " << MPI_Send_user_event  << " MPI_Send\n";
+	stsfile << "EVENT " << MPI_Recv_user_event  << " MPI_Recv\n";
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";
 	
@@ -87,13 +91,26 @@ void write_log_footer(){
 	flush();
 }
 
+
+/// Write out the bracketed user event when it finishes
+void write_USER_EVENT_PAIR(int userEventID, long startTime){
+	long endTime = time_us();
+	int event = 0;
+	int pe = rank;
+	sprintf(curr_buf_position, "100 %d %ld %d %d\n100 %d %ld %d %d\n", userEventID, startTime, event, pe, userEventID, endTime, event, pe);
+	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+}
+
+
 void write_BEGIN_PROCESSING(){
 	
 	int mtype = 0;
 	int entry = 0;
 	long time = time_us();
 	int event = 0;
-	int pe = 0;
+	int pe = rank;
 	int msglen = 0;
 	long recvTime = 0;
 	int id0 = 0;
@@ -114,7 +131,7 @@ void write_END_PROCESSING(){
 	int entry = 0;
 	long time = time_us();
 	int event = 0;
-	int pe = 0;
+	int pe = rank;
 	int msglen = 0;
 	long cpuEndTime = time_us();
 	int numPerfCounts = 0;
@@ -137,14 +154,22 @@ void write_USER_SUPPLIED(int value){
 
 int MPI_Send(void * buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
 	write_END_PROCESSING();
+	
+	long startTime = time_us();
 	int ret = PMPI_Send(buf, count, datatype, dest, tag, comm);
+	write_USER_EVENT_PAIR(MPI_Send_user_event, startTime);
+	
 	write_BEGIN_PROCESSING();
 	return ret;
 }
 
 int MPI_Recv(void* buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Status * status){
 	write_END_PROCESSING();
+	
+	long startTime = time_us();
 	int ret = PMPI_Recv(buf, count, datatype, dest, tag, comm, status);
+	write_USER_EVENT_PAIR(MPI_Recv_user_event, startTime);
+	
 	write_BEGIN_PROCESSING();
 	return ret;
 }

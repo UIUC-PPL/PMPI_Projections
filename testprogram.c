@@ -22,14 +22,17 @@ int main(int argc, char ** argv){
 
 	  startTime = MPI_Wtime();
 
-	  if(rank % 2 == 0) {
-		  MPI_Send(message_s, msg_size, MPI_CHAR, rank+1, 0, MPI_COMM_WORLD);
-		  MPI_Recv(message_r, msg_size, MPI_CHAR, rank+1, 0, MPI_COMM_WORLD, &status); 
-	  } else {
-		  MPI_Recv(message_r, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &status); 
-		  MPI_Send(message_s, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD);
+	  for(int i=0;i<100;i++){
+	    if(rank % 2 == 0) {
+	      MPI_Send(message_s, msg_size, MPI_CHAR, rank+1, 0, MPI_COMM_WORLD);
+	      MPI_Recv(message_r, msg_size, MPI_CHAR, rank+1, 0, MPI_COMM_WORLD, &status); 
+	    } else {
+	      MPI_Recv(message_r, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &status); 
+	      MPI_Send(message_s, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD);
+	    }
 	  }
 
+	  
 	  MPI_Barrier(MPI_COMM_WORLD); 
 	  
 	  MPI_Finalize();
