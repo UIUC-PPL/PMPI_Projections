@@ -12,6 +12,7 @@
 #define MPI_Recv_user_event 1
 #define MPI_Init_user_event 2
 #define MPI_Finalize_user_event 3
+#define MPI_Barrier_user_event 3
 
 long records_since_flush = 0;
 char *out_buf;
@@ -163,6 +164,18 @@ void write_USER_SUPPLIED(int value){
 	curr_buf_position += strlen(curr_buf_position);	// Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
+}
+
+
+int MPI_Barrier(MPI_Comm comm) {
+	write_END_PROCESSING();
+	
+	long startTime = time_us();
+	int ret = PMPI_Barrier(comm);
+	write_USER_EVENT_PAIR(MPI_Barrier_user_event, startTime);
+	
+	write_BEGIN_PROCESSING();
+	return ret;
 }
 
 
