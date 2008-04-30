@@ -33,11 +33,11 @@ int rank;
 int np;
 
 void init_time(){
-	initTime = MPI_Wtime() - 0.1;
+	initTime = PMPI_Wtime() - 0.1;
 }
 
 long time_us(){
-	return ((MPI_Wtime()-initTime)*1000000.0);
+	return ((PMPI_Wtime()-initTime)*1000000.0);
 }
 
 /** 
@@ -274,7 +274,7 @@ int MPI_Finalize(void){
 	
 	PMPI_Barrier(MPI_COMM_WORLD);
 	
-	printf("Starting with %d mangled source code locations\n", source_locations.size());
+	//	printf("Starting with %d mangled source code locations\n", source_locations.size());
 
 	// Send all results to zero
 	int tag = 7777;
@@ -286,7 +286,7 @@ int MPI_Finalize(void){
 
 			for(int j=0; j<incoming_source_locations[0]; j++){
 				source_locations.insert(incoming_source_locations[1+j]);
-				printf("Now we have %d mangled source code locations\n", source_locations.size());
+				//				printf("Now we have %d mangled source code locations\n", source_locations.size());
 			}
 		}
 
