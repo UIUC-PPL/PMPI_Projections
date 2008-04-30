@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <assert.h>
 #include <map>
+#include <set>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <execinfo.h>
 
 #define OUTBUFSIZE 1024*1024*4
 
@@ -12,7 +14,7 @@
 #define MPI_Recv_user_event 1
 #define MPI_Init_user_event 2
 #define MPI_Finalize_user_event 3
-#define MPI_Barrier_user_event 3
+#define MPI_Barrier_user_event 4
 
 long records_since_flush = 0;
 char *out_buf;
@@ -22,6 +24,8 @@ char *flush_point;
 std::ofstream outfile;
 
 std::map<int,std::string> entryToName;
+std::set<int> source_locations;
+
 
 double initTime;
 
@@ -29,13 +33,35 @@ int rank;
 int np;
 
 void init_time(){
-	initTime = MPI_Wtime() - 0.5;
+	initTime = MPI_Wtime() - 0.1;
 }
 
 long time_us(){
 	return ((MPI_Wtime()-initTime)*1000000.0);
 }
 
+/** 
+    Mangle together the return pointers from all stack frames to get a 32-bit integer
+    likely to be a unique for each point in the user's code.
+
+	I am not sure how likely collisions are using this method.
+*/
+unsigned long source_location(){
+	unsigned long long s = 0;
+	void* callstack[128];
+	int i, frames = backtrace(callstack, 128);
+	if(frames > 0){
+		s = (unsigned long long)callstack[0];
+		for (i = 1; i < frames; ++i) {
+			s = s ^ (unsigned long long)callstack[i];
+		}
+	}
+
+	// Drop this down to an unsigned long
+	unsigned long s_ul = (unsigned long)(s & 0xFFFFFFFF) ^  (unsigned long)((s>>32) & 0xFFFFFFFF);
+	
+	return s_ul;
+}
 
 void writeSts(){
 	std::ofstream stsfile("ProjPMPI.sts");
@@ -44,21 +70,25 @@ void writeSts(){
 	stsfile << "VERSION 6.6\n";
 	stsfile << "MACHINE PMPI_Logging\n";
 	stsfile << "PROCESSORS " << np <<"\n";
-	stsfile << "TOTAL_CHARES 2\n";
-	stsfile << "TOTAL_EPS 2\n";
+	stsfile << "TOTAL_CHARES 1\n";
+	stsfile << "TOTAL_EPS " << source_locations.size() << "\n";
 	stsfile << "TOTAL_MSGS 2\n";
 	stsfile << "TOTAL_PSEUDOS 0\n";
-	stsfile << "TOTAL_EVENTS 4\n";
-	stsfile << "CHARE 0 chare2\n";
-	stsfile << "CHARE 1 chare1\n";
-	stsfile << "ENTRY CHARE 0 entry1 0 0\n";
-	stsfile << "ENTRY CHARE 1 entry2 1 1\n";
+	stsfile << "TOTAL_EVENTS 5\n";
+	stsfile << "CHARE 0 charename\n";
+
+	std::set<int>::iterator iter;
+	int id=0;
+	for(iter = source_locations.begin(); iter!= source_locations.end(); iter++){
+		stsfile << "ENTRY CHARE " << *iter << " entryname" << *iter<< "() 0 -1\n";
+	}
 	stsfile << "MESSAGE 0 0\n";
 	stsfile << "MESSAGE 1 0\n";
 	stsfile << "EVENT " << MPI_Send_user_event  << " MPI_Send\n";
 	stsfile << "EVENT " << MPI_Recv_user_event  << " MPI_Recv\n";
 	stsfile << "EVENT " << MPI_Init_user_event  << " MPI_Init\n";
 	stsfile << "EVENT " << MPI_Finalize_user_event  << " MPI_Finalize\n";
+	stsfile << "EVENT " << MPI_Barrier_user_event << " MPI_Barrier\n";
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";
 	
@@ -122,7 +152,7 @@ void write_USER_EVENT(int userEventID){
 void write_BEGIN_PROCESSING(){
 	
 	int mtype = 0;
-	int entry = 0;
+	int entry = source_location();
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
@@ -139,6 +169,10 @@ void write_BEGIN_PROCESSING(){
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
+	
+	source_locations.insert(entry);
+//	printf("%d    TotalSoFar=%d\n", entry, source_locations.size());
+	
 }
 
 void write_END_PROCESSING(){
@@ -234,18 +268,42 @@ int MPI_Init(int * p1, char *** p2){
 int MPI_Finalize(void){
 	write_USER_EVENT(MPI_Finalize_user_event);
 	write_END_PROCESSING();
-
 	write_log_footer();
-	
-	int ret = PMPI_Finalize();
-
-	// flush to file
 	writeToDisk();
 	outfile.close();
 	
-	if(rank == 0)
-		writeSts();
+	PMPI_Barrier(MPI_COMM_WORLD);
 	
+	printf("Starting with %d mangled source code locations\n", source_locations.size());
+
+	// Send all results to zero
+	int tag = 7777;
+	if(rank==0){
+		for(int p=1;p<np;p++){
+			MPI_Status status;
+			int incoming_source_locations[256];
+			PMPI_Recv(incoming_source_locations, 256, MPI_INT, p, tag, MPI_COMM_WORLD, &status);
+
+			for(int j=0; j<incoming_source_locations[0]; j++){
+				source_locations.insert(incoming_source_locations[1+j]);
+				printf("Now we have %d mangled source code locations\n", source_locations.size());
+			}
+		}
+
+		writeSts();
+	} else {
+		assert(source_locations.size()<256);
+		int source_locations_flat[256];
+		source_locations_flat[0] = source_locations.size();
+		int c=1;
+		for(std::set<int>::iterator i = source_locations.begin(); i!=source_locations.end();i++){
+			source_locations_flat[c++] = *i;
+		}
+		PMPI_Send(source_locations_flat, 256, MPI_INT, 0, tag, MPI_COMM_WORLD);
+	}
+	
+
+	int ret = PMPI_Finalize();
 	return ret;
 }
 
