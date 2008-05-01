@@ -26,6 +26,7 @@ std::ofstream outfile;
 std::map<int,std::string> entryToName;
 std::set<int> source_locations;
 
+int recentSourceLocation;
 
 double initTime;
 
@@ -75,12 +76,12 @@ void writeSts(){
 	stsfile << "TOTAL_MSGS 2\n";
 	stsfile << "TOTAL_PSEUDOS 0\n";
 	stsfile << "TOTAL_EVENTS 5\n";
-	stsfile << "CHARE 0 charename\n";
+	stsfile << "CHARE 0 MPI_Main\n";
 
 	std::set<int>::iterator iter;
 	int id=0;
 	for(iter = source_locations.begin(); iter!= source_locations.end(); iter++){
-		stsfile << "ENTRY CHARE " << *iter << " entryname" << *iter<< "() 0 -1\n";
+		stsfile << "ENTRY CHARE " << *iter << " (code region " << *iter<< ") 0 -1\n";
 	}
 	stsfile << "MESSAGE 0 0\n";
 	stsfile << "MESSAGE 1 0\n";
@@ -164,6 +165,8 @@ void write_BEGIN_PROCESSING(){
 	int id3 = 0;
 	long cpuStartTime = 0;
 	int numPerfCounts = 0;
+	
+	recentSourceLocation = entry;
 		
 	sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
@@ -177,12 +180,12 @@ void write_BEGIN_PROCESSING(){
 
 void write_END_PROCESSING(){
 	int mtype = 0;
-	int entry = 0;
+	int entry = recentSourceLocation; // Must match for NoiseMiner to match with previous BEGIN_PROCESSING
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
 	int msglen = 0;
-	long cpuEndTime = time_us();
+	long cpuEndTime = 0;
 	int numPerfCounts = 0;
 		
 	sprintf(curr_buf_position, "3 %d %d %ld %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );
