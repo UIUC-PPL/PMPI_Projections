@@ -1,11 +1,11 @@
 #include<mpi.h>
 #include<stdio.h>
 
-#define msg_size 1024
+#define msg_size 256
 
 double *workarray;
-#define ARRSIZE 1024
-#define NWORKITER 2
+#define ARRSIZE 2
+#define NWORKITER 0
 #define NITER 5000
 
 void do_work(){
@@ -25,7 +25,6 @@ int main(int argc, char ** argv){
 	  char message_s[msg_size], message_r[msg_size];  /* storage for the message */
 	  
 	  MPI_Status status;    /* return status for receive */
-	  double startTime = 0;
 	  	  
 	  MPI_Init( &argc, &argv );
 	  
@@ -37,7 +36,6 @@ int main(int argc, char ** argv){
 	  
 	  MPI_Barrier(MPI_COMM_WORLD); 
 
-	  startTime = MPI_Wtime();
 
 	  for(int i=0;i<NITER;i++){
 	    if(rank % 2 == 0) {
@@ -47,11 +45,16 @@ int main(int argc, char ** argv){
 	      MPI_Recv(message_r, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &status); 
 	      MPI_Send(message_s, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD);
 	    }
-
-
+	    
+	    
 	    do_work();
-	  }
 
+	    if(i > NITER/2){
+	      MPI_Barrier(MPI_COMM_WORLD);
+	    }
+	    
+	  }
+	  
 	  
 	  MPI_Barrier(MPI_COMM_WORLD); 
 	  

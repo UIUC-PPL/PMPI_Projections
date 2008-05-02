@@ -8,6 +8,8 @@
 #include <fstream>
 #include <execinfo.h>
 
+#include "source_location.h"
+
 #define OUTBUFSIZE 1024*1024*4
 
 #define MPI_Send_user_event 0
@@ -41,28 +43,6 @@ long time_us(){
 	return ((PMPI_Wtime()-initTime)*1000000.0);
 }
 
-/** 
-    Mangle together the return pointers from all stack frames to get a 32-bit integer
-    likely to be a unique for each point in the user's code.
-
-	I am not sure how likely collisions are using this method.
-*/
-unsigned long source_location(){
-	unsigned long long s = 0;
-	void* callstack[128];
-	int i, frames = backtrace(callstack, 128);
-	if(frames > 0){
-		s = (unsigned long long)callstack[0];
-		for (i = 1; i < frames; ++i) {
-			s = s ^ (unsigned long long)callstack[i];
-		}
-	}
-
-	// Drop this down to an unsigned long
-	unsigned long s_ul = (unsigned long)(s & 0xFFFFFFFF) ^  (unsigned long)((s>>32) & 0xFFFFFFFF);
-	
-	return s_ul;
-}
 
 void writeSts(){
 	std::ofstream stsfile("ProjPMPI.sts");
@@ -79,7 +59,7 @@ void writeSts(){
 	stsfile << "CHARE 0 MPI_Main\n";
 
 	std::set<int>::iterator iter;
-	int id=0;
+
 	for(iter = source_locations.begin(); iter!= source_locations.end(); iter++){
 		stsfile << "ENTRY CHARE " << *iter << " (code region " << *iter<< ") 0 -1\n";
 	}
@@ -153,7 +133,7 @@ void write_USER_EVENT(int userEventID){
 void write_BEGIN_PROCESSING(){
 	
 	int mtype = 0;
-	int entry = source_location();
+	int entry = source_location_int();
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
@@ -167,7 +147,9 @@ void write_BEGIN_PROCESSING(){
 	int numPerfCounts = 0;
 	
 	recentSourceLocation = entry;
-		
+
+	//	std::cout << "entry=" << entry << std::endl;
+
 	sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
