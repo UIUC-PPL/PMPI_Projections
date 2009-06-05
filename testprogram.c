@@ -95,9 +95,33 @@ int main(int argc, char ** argv){
 	  free(reduce_recv_buf);
 
 	  MPI_Barrier(MPI_COMM_WORLD); 
-	 
- 	 
- 
+
+
+
+
+	  reduce_send_buf = (int*)malloc(5 * sizeof(int));
+	  reduce_recv_buf = (int*)malloc(5 * sizeof(int));
+
+	  for(int i=0;i<5;i++)
+	    reduce_send_buf[i] = rank;
+
+	  int root = 3;
+	  MPI_Reduce((void*)reduce_send_buf, (void*)reduce_recv_buf, 5, MPI_INT, MPI_SUM, root, MPI_COMM_WORLD);
+
+	  if(root == rank){
+	    for(int i=0;i<5;i++){
+	      assert(reduce_recv_buf[i] == (np*(np-1))/2);
+	    }
+	  }
+
+	  free(reduce_send_buf);
+	  free(reduce_recv_buf);
+
+
+
+
+	  MPI_Barrier(MPI_COMM_WORLD); 
+
 	  MPI_Finalize();
 
 	return 0;
