@@ -4,9 +4,9 @@
 #define msg_size 256
 
 double *workarray;
-#define ARRSIZE 2
-#define NWORKITER 0
-#define NITER 5000
+#define ARRSIZE 1024
+#define NWORKITER 2
+#define NITER 3
 
 void do_work(){
   for(int iter = 0; iter<NITER;iter++){

@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <execinfo.h>
 
+#if __USE_STACK_TRACE_TO_IDENTIFY_TASKS__
+
 #include "source_location.h"
 
 
@@ -50,3 +52,18 @@ int source_location_int(){
   //  printf("%d\n", s_int);
   return s_int;
 }
+
+
+#else
+
+int source_location_int(){
+  return 0;
+}
+
+unsigned long source_location_ulong(){
+  return 0;
+}
+
+
+
+#endif

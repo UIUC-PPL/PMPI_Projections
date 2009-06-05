@@ -77,7 +77,7 @@ void writeSts(){
 }
 
 void inline writeToDisk(){
-	outfile << "PROJECTIONS-RECORD " << records_since_flush << "\n";
+  outfile << "PROJECTIONS-RECORD " << records_since_flush << "\n"; // should only appear once in file
 	outfile << out_buf;
 	outfile.flush();
 	curr_buf_position = out_buf;

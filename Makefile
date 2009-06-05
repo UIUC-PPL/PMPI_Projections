@@ -3,6 +3,8 @@
 #MPICH_INC = -I$(MPI_DIR)/include
 MPICH_LIB =  
 
+# USE_STACK = -D__USE_STACK_TRACE_TO_IDENTIFY_TASKS__
+
 MPICC = mpicc 
 MPICXX = mpicxx 
 
