@@ -31,6 +31,9 @@ testprogram : testprogram.o PMPI_ProjectionsLogging.o Makefile source_location.o
 stack_test : stack_test.C source_location.o
 	$(CXX) stack_test.C -o stacktest source_location.o
 
+test : testprogram
+	mpirun -n 4 ./testprogram
+
 clean : 
 	rm -f *.o $(TARGETS) *.log $(objs) *.sts *.projrc *~
  
