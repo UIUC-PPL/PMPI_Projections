@@ -35,5 +35,5 @@ test : testprogram
 	mpirun -n 4 ./testprogram
 
 clean : 
-	rm -f *.o $(TARGETS) *.log $(objs) *.sts *.projrc *~
+	rm -rf *.o $(TARGETS) *.log $(objs) *.sts *.projrc *~ stacktest.dSYM stacktest 
  
