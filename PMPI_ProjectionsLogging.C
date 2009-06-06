@@ -22,6 +22,9 @@
 #define MPI_Allreduce_user_event 7
 #define MPI_Reduce_user_event 8
 #define MPI_Wait_user_event 9
+#define MPI_Waitall_user_event 10
+
+int NUM_EVENTS = 11;
 
 long records_since_flush = 0;
 char *out_buf;
@@ -60,7 +63,7 @@ void writeSts(){
 	stsfile << "TOTAL_EPS " << source_locations.size() << "\n";
 	stsfile << "TOTAL_MSGS 2\n";
 	stsfile << "TOTAL_PSEUDOS 0\n";
-	stsfile << "TOTAL_EVENTS 10\n";
+	stsfile << "TOTAL_EVENTS " << NUM_EVENTS << "\n";
 	stsfile << "CHARE 0 MPI_Main\n";
 
 	std::set<int>::iterator iter;
@@ -80,6 +83,7 @@ void writeSts(){
 	stsfile << "EVENT " << MPI_Allreduce_user_event << " MPI_Allreduce\n";
 	stsfile << "EVENT " << MPI_Reduce_user_event  << " MPI_Reduce\n";
 	stsfile << "EVENT " << MPI_Wait_user_event << " MPI_Wait\n";
+	stsfile << "EVENT " << MPI_Waitall_user_event << " MPI_Waitall\n";
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";
 	
@@ -288,6 +292,19 @@ int MPI_Wait(MPI_Request *request, MPI_Status *status) {
 	write_BEGIN_PROCESSING();
 	return ret;
 }
+
+
+int MPI_Waitall(int count, MPI_Request *array_of_requests, MPI_Status *array_of_statuses) {
+	write_END_PROCESSING();
+	
+	long startTime = time_us();
+	int ret = PMPI_Waitall(count,  array_of_requests, array_of_statuses);
+	write_USER_EVENT_PAIR(MPI_Waitall_user_event, startTime);
+	
+	write_BEGIN_PROCESSING();
+	return ret;
+}
+
 
 
 int MPI_Init(int * p1, char *** p2){
