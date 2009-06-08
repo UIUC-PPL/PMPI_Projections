@@ -1,3 +1,4 @@
+# (c) 2009 Isaac Dooley
 
 #MPI_DIR = $(HOME)/local/mpich2/
 #MPICH_INC = -I$(MPI_DIR)/include

@@ -1,3 +1,5 @@
+// (c) 2009 Isaac Dooley
+
 #include <mpi.h>
 #include <stdio.h>
 #include <assert.h>

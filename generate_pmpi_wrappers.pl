@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-
+#
+# (c) 2009 Isaac Dooley
+#
 
 my %funcsToIgnore = ("MPI_Init" => true,  
 		     "MPI_Initialized" => true,

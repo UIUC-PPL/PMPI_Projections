@@ -1,3 +1,4 @@
+// (c) 2009 Isaac Dooley
 
 #include <mpi.h>
 #include "generated-eventids.h"
