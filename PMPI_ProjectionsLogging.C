@@ -35,7 +35,7 @@ int rank;
 int np;
 
 void init_time(){
-	initTime = PMPI_Wtime() - 0.1;
+	initTime = PMPI_Wtime() - 0.001;
 }
 
 long time_us(){

@@ -7,8 +7,8 @@
 #define msg_size 256
 
 double *workarray;
-#define ARRSIZE 1024
-#define NWORKITER 100
+#define ARRSIZE 10240
+#define NWORKITER 500
 #define NITER 5
 
 void do_work(){
@@ -18,7 +18,6 @@ void do_work(){
     }
   }
   assert(workarray[7] > 0.0);
-  usleep(10);
 }
 
 
