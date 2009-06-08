@@ -198,10 +198,7 @@ int MPI_Init(int * p1, char *** p2){
 	PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	PMPI_Comm_size( MPI_COMM_WORLD, &np );
 	init_time();
-	
-	// The code in trace-projections.C assumes we are in a charm++ program, 
-	// so we will do a little setup here so that things will work
-	
+     	
 	out_buf = (char*)malloc(OUTBUFSIZE);
 	assert(out_buf);
 	out_buf[0]='\0';
