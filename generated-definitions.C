@@ -12,46 +12,6 @@ int MPI_Abort (MPI_Comm comm, int errorcode) {
 }
 
 
-int MPI_Accumulate (void *origin_addr, int origin_count, MPI_Datatype origin_datatype, int target_rank, MPI_Aint target_disp, int target_count, MPI_Datatype target_datatype, MPI_Op op, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Accumulate( origin_addr,  origin_count,  origin_datatype,  target_rank,  target_disp,  target_count,  target_datatype,  op,  win);
-	write_EVENT_PAIR(MPI_Accumulate_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Add_error_class (int *errorclass) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Add_error_class( errorclass);
-	write_EVENT_PAIR(MPI_Add_error_class_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Add_error_code (int errorclass, int *errorcode) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Add_error_code( errorclass,  errorcode);
-	write_EVENT_PAIR(MPI_Add_error_code_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Add_error_string (int errorcode, char *string) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Add_error_string( errorcode,  string);
-	write_EVENT_PAIR(MPI_Add_error_string_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Address (void *location, MPI_Aint *address) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -82,16 +42,6 @@ int MPI_Allgatherv (void *sendbuf, int sendcount, MPI_Datatype sendtype, void *r
 }
 
 
-int MPI_Alloc_mem (MPI_Aint size, MPI_Info info, void *baseptr) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Alloc_mem( size,  info,  baseptr);
-	write_EVENT_PAIR(MPI_Alloc_mem_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Allreduce (void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -117,46 +67,6 @@ int MPI_Alltoallv (void *sendbuf, int *sendcounts, int *sdispls, MPI_Datatype se
 	long startTime = time_us();
 	int ret = PMPI_Alltoallv( sendbuf,  sendcounts,  sdispls,  sendtype,  recvbuf,  recvcounts,  rdispls,  recvtype,  comm);
 	write_EVENT_PAIR(MPI_Alltoallv_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Alltoallw (void *sendbuf, int *sendcounts, int *sdispls, MPI_Datatype *sendtypes, void *recvbuf, int *recvcounts, int *rdispls, MPI_Datatype *recvtypes, MPI_Comm comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Alltoallw( sendbuf,  sendcounts,  sdispls,  sendtypes,  recvbuf,  recvcounts,  rdispls,  recvtypes,  comm);
-	write_EVENT_PAIR(MPI_Alltoallw_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Attr_delete (MPI_Comm comm, int keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Attr_delete( comm,  keyval);
-	write_EVENT_PAIR(MPI_Attr_delete_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Attr_get (MPI_Comm comm, int keyval, void *attribute_val, int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Attr_get( comm,  keyval,  attribute_val,  flag);
-	write_EVENT_PAIR(MPI_Attr_get_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Attr_put (MPI_Comm comm, int keyval, void *attribute_val) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Attr_put( comm,  keyval,  attribute_val);
-	write_EVENT_PAIR(MPI_Attr_put_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -312,81 +222,11 @@ int MPI_Cartdim_get (MPI_Comm comm, int *ndims) {
 }
 
 
-int MPI_Close_port (char *port_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Close_port( port_name);
-	write_EVENT_PAIR(MPI_Close_port_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_accept (char *port_name, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *newcomm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_accept( port_name,  info,  root,  comm,  newcomm);
-	write_EVENT_PAIR(MPI_Comm_accept_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Fint MPI_Comm_c2f (MPI_Comm comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Comm_c2f( comm);
-	write_EVENT_PAIR(MPI_Comm_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_call_errhandler (MPI_Comm comm, int errorcode) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_call_errhandler( comm,  errorcode);
-	write_EVENT_PAIR(MPI_Comm_call_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Comm_compare (MPI_Comm comm1, MPI_Comm comm2, int *result) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Comm_compare( comm1,  comm2,  result);
 	write_EVENT_PAIR(MPI_Comm_compare_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_connect (char *port_name, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *newcomm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_connect( port_name,  info,  root,  comm,  newcomm);
-	write_EVENT_PAIR(MPI_Comm_connect_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_create_errhandler (MPI_Comm_errhandler_fn *function,   MPI_Errhandler *errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_create_errhandler( function,    errhandler);
-	write_EVENT_PAIR(MPI_Comm_create_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_create_keyval (MPI_Comm_copy_attr_function *comm_copy_attr_fn,  MPI_Comm_delete_attr_function *comm_delete_attr_fn,  int *comm_keyval, void *extra_state) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_create_keyval( comm_copy_attr_fn,   comm_delete_attr_fn,   comm_keyval,  extra_state);
-	write_EVENT_PAIR(MPI_Comm_create_keyval_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -402,51 +242,11 @@ int MPI_Comm_create (MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm) {
 }
 
 
-int MPI_Comm_delete_attr (MPI_Comm comm, int comm_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_delete_attr( comm,  comm_keyval);
-	write_EVENT_PAIR(MPI_Comm_delete_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_disconnect (MPI_Comm *comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_disconnect( comm);
-	write_EVENT_PAIR(MPI_Comm_disconnect_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Comm_dup (MPI_Comm comm, MPI_Comm *newcomm) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Comm_dup( comm,  newcomm);
 	write_EVENT_PAIR(MPI_Comm_dup_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Comm MPI_Comm_f2c (MPI_Fint comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Comm ret = PMPI_Comm_f2c( comm);
-	write_EVENT_PAIR(MPI_Comm_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_free_keyval (int *comm_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_free_keyval( comm_keyval);
-	write_EVENT_PAIR(MPI_Comm_free_keyval_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -462,26 +262,6 @@ int MPI_Comm_free (MPI_Comm *comm) {
 }
 
 
-int MPI_Comm_get_attr (MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_get_attr( comm,  comm_keyval,  attribute_val,  flag);
-	write_EVENT_PAIR(MPI_Comm_get_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_get_errhandler (MPI_Comm comm, MPI_Errhandler *erhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_get_errhandler( comm,  erhandler);
-	write_EVENT_PAIR(MPI_Comm_get_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Comm_get_name (MPI_Comm comm, char *comm_name, int *resultlen) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -492,31 +272,11 @@ int MPI_Comm_get_name (MPI_Comm comm, char *comm_name, int *resultlen) {
 }
 
 
-int MPI_Comm_get_parent (MPI_Comm *parent) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_get_parent( parent);
-	write_EVENT_PAIR(MPI_Comm_get_parent_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Comm_group (MPI_Comm comm, MPI_Group *group) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Comm_group( comm,  group);
 	write_EVENT_PAIR(MPI_Comm_group_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_join (int fd, MPI_Comm *intercomm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_join( fd,  intercomm);
-	write_EVENT_PAIR(MPI_Comm_join_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -552,61 +312,11 @@ int MPI_Comm_remote_size (MPI_Comm comm, int *size) {
 }
 
 
-int MPI_Comm_set_attr (MPI_Comm comm, int comm_keyval, void *attribute_val) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_set_attr( comm,  comm_keyval,  attribute_val);
-	write_EVENT_PAIR(MPI_Comm_set_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_set_errhandler (MPI_Comm comm, MPI_Errhandler errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_set_errhandler( comm,  errhandler);
-	write_EVENT_PAIR(MPI_Comm_set_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_set_name (MPI_Comm comm, char *comm_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_set_name( comm,  comm_name);
-	write_EVENT_PAIR(MPI_Comm_set_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Comm_size (MPI_Comm comm, int *size) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Comm_size( comm,  size);
 	write_EVENT_PAIR(MPI_Comm_size_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_spawn (char *command, char **argv, int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int *array_of_errcodes) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_spawn( command,  argv,  maxprocs,  info,  root,  comm,  intercomm,  array_of_errcodes);
-	write_EVENT_PAIR(MPI_Comm_spawn_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Comm_spawn_multiple (int count, char **array_of_commands, char ***array_of_argv,  int *array_of_maxprocs, MPI_Info *array_of_info,  int root, MPI_Comm comm, MPI_Comm *intercomm,  int *array_of_errcodes) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Comm_spawn_multiple( count,  array_of_commands,  array_of_argv,   array_of_maxprocs,  array_of_info,   root,  comm,  intercomm,   array_of_errcodes);
-	write_EVENT_PAIR(MPI_Comm_spawn_multiple_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -642,31 +352,11 @@ int MPI_Dims_create (int nnodes, int ndims, int *dims) {
 }
 
 
-MPI_Fint MPI_Errhandler_c2f (MPI_Errhandler errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Errhandler_c2f( errhandler);
-	write_EVENT_PAIR(MPI_Errhandler_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Errhandler_create (MPI_Handler_function *function,  MPI_Errhandler *errhandler) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Errhandler_create( function,   errhandler);
 	write_EVENT_PAIR(MPI_Errhandler_create_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Errhandler MPI_Errhandler_f2c (MPI_Fint errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Errhandler ret = PMPI_Errhandler_f2c( errhandler);
-	write_EVENT_PAIR(MPI_Errhandler_f2c_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -692,16 +382,6 @@ int MPI_Errhandler_get (MPI_Comm comm, MPI_Errhandler *errhandler) {
 }
 
 
-int MPI_Errhandler_set (MPI_Comm comm, MPI_Errhandler errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Errhandler_set( comm,  errhandler);
-	write_EVENT_PAIR(MPI_Errhandler_set_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Error_class (int errorcode, int *errorclass) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -722,16 +402,6 @@ int MPI_Error_string (int errorcode, char *string, int *resultlen) {
 }
 
 
-int MPI_Exscan (void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Exscan( sendbuf,  recvbuf,  count,  datatype,  op,  comm);
-	write_EVENT_PAIR(MPI_Exscan_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 MPI_Fint MPI_File_c2f (MPI_File file) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -747,26 +417,6 @@ MPI_File MPI_File_f2c (MPI_Fint file) {
 	long startTime = time_us();
 	MPI_File ret = PMPI_File_f2c( file);
 	write_EVENT_PAIR(MPI_File_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_call_errhandler (MPI_File fh, int errorcode) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_call_errhandler( fh,  errorcode);
-	write_EVENT_PAIR(MPI_File_call_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_create_errhandler (MPI_File_errhandler_fn *function,   MPI_Errhandler *errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_create_errhandler( function,    errhandler);
-	write_EVENT_PAIR(MPI_File_create_errhandler_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -952,26 +602,6 @@ int MPI_File_write_at_all (MPI_File fh, MPI_Offset offset, void *buf,  int count
 }
 
 
-int MPI_File_iread_at (MPI_File fh, MPI_Offset offset, void *buf, int count, MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iread_at( fh,  offset,  buf,  count,  datatype,  request);
-	write_EVENT_PAIR(MPI_File_iread_at_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_iwrite_at (MPI_File fh, MPI_Offset offset, void *buf, int count, MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iwrite_at( fh,  offset,  buf,  count,  datatype,  request);
-	write_EVENT_PAIR(MPI_File_iwrite_at_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_File_read (MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1007,26 +637,6 @@ int MPI_File_write_all (MPI_File fh, void *buf, int count, MPI_Datatype datatype
 	long startTime = time_us();
 	int ret = PMPI_File_write_all( fh,  buf,  count,  datatype,  status);
 	write_EVENT_PAIR(MPI_File_write_all_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_iread (MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iread( fh,  buf,  count,  datatype,  request);
-	write_EVENT_PAIR(MPI_File_iread_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_iwrite (MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iwrite( fh,  buf,  count,  datatype,  request);
-	write_EVENT_PAIR(MPI_File_iwrite_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -1077,26 +687,6 @@ int MPI_File_write_shared (MPI_File fh, void *buf, int count,  MPI_Datatype data
 	long startTime = time_us();
 	int ret = PMPI_File_write_shared( fh,  buf,  count,   datatype,  status);
 	write_EVENT_PAIR(MPI_File_write_shared_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_iread_shared (MPI_File fh, void *buf, int count,  MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iread_shared( fh,  buf,  count,   datatype,  request);
-	write_EVENT_PAIR(MPI_File_iread_shared_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_File_iwrite_shared (MPI_File fh, void *buf, int count,  MPI_Datatype datatype, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_File_iwrite_shared( fh,  buf,  count,   datatype,  request);
-	write_EVENT_PAIR(MPI_File_iwrite_shared_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -1302,26 +892,6 @@ int MPI_File_sync (MPI_File fh) {
 }
 
 
-int MPI_Finalized (int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Finalized( flag);
-	write_EVENT_PAIR(MPI_Finalized_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Free_mem (void *base) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Free_mem( base);
-	write_EVENT_PAIR(MPI_Free_mem_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Gather (void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1342,16 +912,6 @@ int MPI_Gatherv (void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recv
 }
 
 
-int MPI_Get_address (void *location, MPI_Aint *address) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Get_address( location,  address);
-	write_EVENT_PAIR(MPI_Get_address_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Get_count (MPI_Status *status, MPI_Datatype datatype, int *count) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1367,16 +927,6 @@ int MPI_Get_elements (MPI_Status *status, MPI_Datatype datatype, int *count) {
 	long startTime = time_us();
 	int ret = PMPI_Get_elements( status,  datatype,  count);
 	write_EVENT_PAIR(MPI_Get_elements_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Get (void *origin_addr, int origin_count,   MPI_Datatype origin_datatype, int target_rank,   MPI_Aint target_disp, int target_count,   MPI_Datatype target_datatype, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Get( origin_addr,  origin_count,    origin_datatype,  target_rank,    target_disp,  target_count,    target_datatype,  win);
-	write_EVENT_PAIR(MPI_Get_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -1462,36 +1012,6 @@ int MPI_Graphdims_get (MPI_Comm comm, int *nnodes, int *nedges) {
 }
 
 
-int MPI_Grequest_complete (MPI_Request request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Grequest_complete( request);
-	write_EVENT_PAIR(MPI_Grequest_complete_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Grequest_start (MPI_Grequest_query_function *query_fn, MPI_Grequest_free_function *free_fn, MPI_Grequest_cancel_function *cancel_fn, void *extra_state, MPI_Request *request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Grequest_start( query_fn,  free_fn,  cancel_fn,  extra_state,  request);
-	write_EVENT_PAIR(MPI_Grequest_start_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Fint MPI_Group_c2f (MPI_Group group) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Group_c2f( group);
-	write_EVENT_PAIR(MPI_Group_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Group_compare (MPI_Group group1, MPI_Group group2, int *result) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1517,16 +1037,6 @@ int MPI_Group_excl (MPI_Group group, int n, int *ranks, MPI_Group *newgroup) {
 	long startTime = time_us();
 	int ret = PMPI_Group_excl( group,  n,  ranks,  newgroup);
 	write_EVENT_PAIR(MPI_Group_excl_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Group MPI_Group_f2c (MPI_Fint group) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Group ret = PMPI_Group_f2c( group);
-	write_EVENT_PAIR(MPI_Group_f2c_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -1822,16 +1332,6 @@ int MPI_Issend (void *buf, int count, MPI_Datatype datatype, int dest, int tag, 
 }
 
 
-int MPI_Is_thread_main (int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Is_thread_main( flag);
-	write_EVENT_PAIR(MPI_Is_thread_main_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Keyval_create (MPI_Copy_function *copy_fn, MPI_Delete_function *delete_fn, int *keyval, void *extra_state) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1852,26 +1352,6 @@ int MPI_Keyval_free (int *keyval) {
 }
 
 
-int MPI_Lookup_name (char *service_name, MPI_Info info, char *port_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Lookup_name( service_name,  info,  port_name);
-	write_EVENT_PAIR(MPI_Lookup_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Fint MPI_Op_c2f (MPI_Op op) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Op_c2f( op);
-	write_EVENT_PAIR(MPI_Op_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Op_create (MPI_User_function *function, int commute, MPI_Op *op) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -1882,51 +1362,11 @@ int MPI_Op_create (MPI_User_function *function, int commute, MPI_Op *op) {
 }
 
 
-int MPI_Open_port (MPI_Info info, char *port_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Open_port( info,  port_name);
-	write_EVENT_PAIR(MPI_Open_port_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Op MPI_Op_f2c (MPI_Fint op) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Op ret = PMPI_Op_f2c( op);
-	write_EVENT_PAIR(MPI_Op_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Op_free (MPI_Op *op) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Op_free( op);
 	write_EVENT_PAIR(MPI_Op_free_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Pack_external (char *datarep, void *inbuf, int incount, MPI_Datatype datatype, void *outbuf, MPI_Aint outsize, MPI_Aint *position) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Pack_external( datarep,  inbuf,  incount,  datatype,  outbuf,  outsize,  position);
-	write_EVENT_PAIR(MPI_Pack_external_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Pack_external_size (char *datarep, int incount,  MPI_Datatype datatype, MPI_Aint *size) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Pack_external_size( datarep,  incount,   datatype,  size);
-	write_EVENT_PAIR(MPI_Pack_external_size_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -1957,36 +1397,6 @@ int MPI_Probe (int source, int tag, MPI_Comm comm, MPI_Status *status) {
 	long startTime = time_us();
 	int ret = PMPI_Probe( source,  tag,  comm,  status);
 	write_EVENT_PAIR(MPI_Probe_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Publish_name (char *service_name, MPI_Info info, char *port_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Publish_name( service_name,  info,  port_name);
-	write_EVENT_PAIR(MPI_Publish_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Put (void *origin_addr, int origin_count, MPI_Datatype origin_datatype,   int target_rank, MPI_Aint target_disp, int target_count,   MPI_Datatype target_datatype, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Put( origin_addr,  origin_count,  origin_datatype,    target_rank,  target_disp,  target_count,    target_datatype,  win);
-	write_EVENT_PAIR(MPI_Put_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Query_thread (int *provided) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Query_thread( provided);
-	write_EVENT_PAIR(MPI_Query_thread_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -2042,41 +1452,11 @@ int MPI_Register_datarep (char *datarep,  MPI_Datarep_conversion_function *read_
 }
 
 
-MPI_Fint MPI_Request_c2f (MPI_Request request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Request_c2f( request);
-	write_EVENT_PAIR(MPI_Request_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Request MPI_Request_f2c (MPI_Fint request) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Request ret = PMPI_Request_f2c( request);
-	write_EVENT_PAIR(MPI_Request_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Request_free (MPI_Request *request) {
 	write_END_PROCESSING();
 	long startTime = time_us();
 	int ret = PMPI_Request_free( request);
 	write_EVENT_PAIR(MPI_Request_free_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Request_get_status (MPI_Request request, int *flag,  MPI_Status *status) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Request_get_status( request,  flag,   status);
-	write_EVENT_PAIR(MPI_Request_get_status_event, startTime);
 	write_BEGIN_PROCESSING();
 	return ret;
 }
@@ -2212,26 +1592,6 @@ int MPI_Startall (int count, MPI_Request *array_of_requests) {
 }
 
 
-int MPI_Status_c2f (MPI_Status *c_status, MPI_Fint *f_status) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Status_c2f( c_status,  f_status);
-	write_EVENT_PAIR(MPI_Status_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Status_f2c (MPI_Fint *f_status, MPI_Status *c_status) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Status_f2c( f_status,  c_status);
-	write_EVENT_PAIR(MPI_Status_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Status_set_cancelled (MPI_Status *status, int flag) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -2312,396 +1672,6 @@ int MPI_Topo_test (MPI_Comm comm, int *status) {
 }
 
 
-MPI_Fint MPI_Type_c2f (MPI_Datatype datatype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Type_c2f( datatype);
-	write_EVENT_PAIR(MPI_Type_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_commit (MPI_Datatype *type) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_commit( type);
-	write_EVENT_PAIR(MPI_Type_commit_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_contiguous (int count, MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_contiguous( count,  oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_contiguous_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_darray (int size, int rank, int ndims,  int gsize_array[], int distrib_array[],  int darg_array[], int psize_array[],  int order, MPI_Datatype oldtype,  MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_darray( size,  rank,  ndims,   gsize_array ,  distrib_array ,   darg_array ,  psize_array ,   order,  oldtype,   newtype);
-	write_EVENT_PAIR(MPI_Type_create_darray_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_f90_complex (int p, int r, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_f90_complex( p,  r,  newtype);
-	write_EVENT_PAIR(MPI_Type_create_f90_complex_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_f90_integer (int r, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_f90_integer( r,  newtype);
-	write_EVENT_PAIR(MPI_Type_create_f90_integer_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_f90_real (int p, int r, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_f90_real( p,  r,  newtype);
-	write_EVENT_PAIR(MPI_Type_create_f90_real_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_hindexed (int count, int array_of_blocklengths[],   MPI_Aint array_of_displacements[],   MPI_Datatype oldtype,   MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_hindexed( count,  array_of_blocklengths ,    array_of_displacements ,    oldtype,    newtype);
-	write_EVENT_PAIR(MPI_Type_create_hindexed_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_hvector (int count, int blocklength, MPI_Aint stride,  MPI_Datatype oldtype,  MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_hvector( count,  blocklength,  stride,   oldtype,   newtype);
-	write_EVENT_PAIR(MPI_Type_create_hvector_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_keyval (MPI_Type_copy_attr_function *type_copy_attr_fn,  MPI_Type_delete_attr_function *type_delete_attr_fn,  int *type_keyval, void *extra_state) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_keyval( type_copy_attr_fn,   type_delete_attr_fn,   type_keyval,  extra_state);
-	write_EVENT_PAIR(MPI_Type_create_keyval_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_indexed_block (int count, int blocklength,    int array_of_displacements[],    MPI_Datatype oldtype,    MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_indexed_block( count,  blocklength,     array_of_displacements ,     oldtype,     newtype);
-	write_EVENT_PAIR(MPI_Type_create_indexed_block_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_struct (int count, int array_of_block_lengths[],  MPI_Aint array_of_displacements[],  MPI_Datatype array_of_types[],  MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_struct( count,  array_of_block_lengths ,   array_of_displacements ,   array_of_types ,   newtype);
-	write_EVENT_PAIR(MPI_Type_create_struct_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_subarray (int ndims, int size_array[], int subsize_array[],   int start_array[], int order,   MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_subarray( ndims,  size_array ,  subsize_array ,    start_array ,  order,    oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_create_subarray_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_create_resized (MPI_Datatype oldtype, MPI_Aint lb,  MPI_Aint extent, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_create_resized( oldtype,  lb,   extent,  newtype);
-	write_EVENT_PAIR(MPI_Type_create_resized_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_delete_attr (MPI_Datatype type, int type_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_delete_attr( type,  type_keyval);
-	write_EVENT_PAIR(MPI_Type_delete_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_dup (MPI_Datatype type, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_dup( type,  newtype);
-	write_EVENT_PAIR(MPI_Type_dup_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_extent (MPI_Datatype type, MPI_Aint *extent) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_extent( type,  extent);
-	write_EVENT_PAIR(MPI_Type_extent_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_free (MPI_Datatype *type) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_free( type);
-	write_EVENT_PAIR(MPI_Type_free_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_free_keyval (int *type_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_free_keyval( type_keyval);
-	write_EVENT_PAIR(MPI_Type_free_keyval_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Datatype MPI_Type_f2c (MPI_Fint datatype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Datatype ret = PMPI_Type_f2c( datatype);
-	write_EVENT_PAIR(MPI_Type_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_attr (MPI_Datatype type, int type_keyval, void *attribute_val, int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_attr( type,  type_keyval,  attribute_val,  flag);
-	write_EVENT_PAIR(MPI_Type_get_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_contents (MPI_Datatype mtype, int max_integers,  int max_addresses, int max_datatypes,  int array_of_integers[],  MPI_Aint array_of_addresses[],  MPI_Datatype array_of_datatypes[]) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_contents( mtype,  max_integers,   max_addresses,  max_datatypes,   array_of_integers ,   array_of_addresses ,   array_of_datatypes );
-	write_EVENT_PAIR(MPI_Type_get_contents_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_envelope (MPI_Datatype type, int *num_integers,  int *num_addresses, int *num_datatypes,  int *combiner) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_envelope( type,  num_integers,   num_addresses,  num_datatypes,   combiner);
-	write_EVENT_PAIR(MPI_Type_get_envelope_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_extent (MPI_Datatype type, MPI_Aint *lb, MPI_Aint *extent) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_extent( type,  lb,  extent);
-	write_EVENT_PAIR(MPI_Type_get_extent_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_name (MPI_Datatype type, char *type_name, int *resultlen) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_name( type,  type_name,  resultlen);
-	write_EVENT_PAIR(MPI_Type_get_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_get_true_extent (MPI_Datatype datatype, MPI_Aint *true_lb,   MPI_Aint *true_extent) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_get_true_extent( datatype,  true_lb,    true_extent);
-	write_EVENT_PAIR(MPI_Type_get_true_extent_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_hindexed (int count, int array_of_blocklengths[], MPI_Aint array_of_displacements[], MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_hindexed( count,  array_of_blocklengths ,  array_of_displacements ,  oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_hindexed_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_hvector (int count, int blocklength, MPI_Aint stride, MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_hvector( count,  blocklength,  stride,  oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_hvector_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_indexed (int count, int array_of_blocklengths[], int array_of_displacements[], MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_indexed( count,  array_of_blocklengths ,  array_of_displacements ,  oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_indexed_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_lb (MPI_Datatype type, MPI_Aint *lb) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_lb( type,  lb);
-	write_EVENT_PAIR(MPI_Type_lb_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_match_size (int typeclass, int size, MPI_Datatype *type) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_match_size( typeclass,  size,  type);
-	write_EVENT_PAIR(MPI_Type_match_size_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_set_attr (MPI_Datatype type, int type_keyval, void *attr_val) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_set_attr( type,  type_keyval,  attr_val);
-	write_EVENT_PAIR(MPI_Type_set_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_set_name (MPI_Datatype type, char *type_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_set_name( type,  type_name);
-	write_EVENT_PAIR(MPI_Type_set_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_size (MPI_Datatype type, int *size) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_size( type,  size);
-	write_EVENT_PAIR(MPI_Type_size_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_struct (int count, int array_of_blocklengths[], MPI_Aint array_of_displacements[], MPI_Datatype array_of_types[], MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_struct( count,  array_of_blocklengths ,  array_of_displacements ,  array_of_types ,  newtype);
-	write_EVENT_PAIR(MPI_Type_struct_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_ub (MPI_Datatype mtype, MPI_Aint *ub) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_ub( mtype,  ub);
-	write_EVENT_PAIR(MPI_Type_ub_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Type_vector (int count, int blocklength, int stride, MPI_Datatype oldtype, MPI_Datatype *newtype) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Type_vector( count,  blocklength,  stride,  oldtype,  newtype);
-	write_EVENT_PAIR(MPI_Type_vector_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Unpack (void *inbuf, int insize, int *position, void *outbuf, int outcount, MPI_Datatype datatype, MPI_Comm comm) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Unpack( inbuf,  insize,  position,  outbuf,  outcount,  datatype,  comm);
-	write_EVENT_PAIR(MPI_Unpack_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Unpublish_name (char *service_name, MPI_Info info, char *port_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Unpublish_name( service_name,  info,  port_name);
-	write_EVENT_PAIR(MPI_Unpublish_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 int MPI_Waitall (int count, MPI_Request *array_of_requests, MPI_Status *array_of_statuses) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -2742,246 +1712,6 @@ int MPI_Waitsome (int incount, MPI_Request *array_of_requests, int *outcount, in
 }
 
 
-MPI_Fint MPI_Win_c2f (MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Fint ret = PMPI_Win_c2f( win);
-	write_EVENT_PAIR(MPI_Win_c2f_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_call_errhandler (MPI_Win win, int errorcode) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_call_errhandler( win,  errorcode);
-	write_EVENT_PAIR(MPI_Win_call_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_complete (MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_complete( win);
-	write_EVENT_PAIR(MPI_Win_complete_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_create (void *base, MPI_Aint size, int disp_unit, MPI_Info info, MPI_Comm comm, MPI_Win *win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_create( base,  size,  disp_unit,  info,  comm,  win);
-	write_EVENT_PAIR(MPI_Win_create_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_create_errhandler (MPI_Win_errhandler_fn *function,   MPI_Errhandler *errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_create_errhandler( function,    errhandler);
-	write_EVENT_PAIR(MPI_Win_create_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_create_keyval (MPI_Win_copy_attr_function *win_copy_attr_fn,  MPI_Win_delete_attr_function *win_delete_attr_fn,  int *win_keyval, void *extra_state) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_create_keyval( win_copy_attr_fn,   win_delete_attr_fn,   win_keyval,  extra_state);
-	write_EVENT_PAIR(MPI_Win_create_keyval_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_delete_attr (MPI_Win win, int win_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_delete_attr( win,  win_keyval);
-	write_EVENT_PAIR(MPI_Win_delete_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-MPI_Win MPI_Win_f2c (MPI_Fint win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	MPI_Win ret = PMPI_Win_f2c( win);
-	write_EVENT_PAIR(MPI_Win_f2c_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_fence (int assert, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_fence( assert,  win);
-	write_EVENT_PAIR(MPI_Win_fence_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_free (MPI_Win *win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_free( win);
-	write_EVENT_PAIR(MPI_Win_free_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_free_keyval (int *win_keyval) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_free_keyval( win_keyval);
-	write_EVENT_PAIR(MPI_Win_free_keyval_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_get_attr (MPI_Win win, int win_keyval, void *attribute_val, int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_get_attr( win,  win_keyval,  attribute_val,  flag);
-	write_EVENT_PAIR(MPI_Win_get_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_get_errhandler (MPI_Win win, MPI_Errhandler *errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_get_errhandler( win,  errhandler);
-	write_EVENT_PAIR(MPI_Win_get_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_get_group (MPI_Win win, MPI_Group *group) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_get_group( win,  group);
-	write_EVENT_PAIR(MPI_Win_get_group_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_get_name (MPI_Win win, char *win_name, int *resultlen) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_get_name( win,  win_name,  resultlen);
-	write_EVENT_PAIR(MPI_Win_get_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_lock (int lock_type, int rank, int assert, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_lock( lock_type,  rank,  assert,  win);
-	write_EVENT_PAIR(MPI_Win_lock_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_post (MPI_Group group, int assert, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_post( group,  assert,  win);
-	write_EVENT_PAIR(MPI_Win_post_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_set_attr (MPI_Win win, int win_keyval, void *attribute_val) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_set_attr( win,  win_keyval,  attribute_val);
-	write_EVENT_PAIR(MPI_Win_set_attr_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_set_errhandler (MPI_Win win, MPI_Errhandler errhandler) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_set_errhandler( win,  errhandler);
-	write_EVENT_PAIR(MPI_Win_set_errhandler_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_set_name (MPI_Win win, char *win_name) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_set_name( win,  win_name);
-	write_EVENT_PAIR(MPI_Win_set_name_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_start (MPI_Group group, int assert, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_start( group,  assert,  win);
-	write_EVENT_PAIR(MPI_Win_start_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_test (MPI_Win win, int *flag) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_test( win,  flag);
-	write_EVENT_PAIR(MPI_Win_test_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_unlock (int rank, MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_unlock( rank,  win);
-	write_EVENT_PAIR(MPI_Win_unlock_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Win_wait (MPI_Win win) {
-	write_END_PROCESSING();
-	long startTime = time_us();
-	int ret = PMPI_Win_wait( win);
-	write_EVENT_PAIR(MPI_Win_wait_event, startTime);
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
 double MPI_Wtick (void) {
 	write_END_PROCESSING();
 	long startTime = time_us();
@@ -3006,5 +1736,5 @@ double MPI_Wtime (void) {
 
 
 // Automatically generated by generate_pmpi_wrappers.pl
-// This file contains 300 wrapped mpi calls.
+// This file contains 173 wrapped mpi calls.
 // PMPI_ProjectionsLogging.C wraps up two others (MPI_Init, MPI_Finalize)

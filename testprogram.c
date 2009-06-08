@@ -1,5 +1,7 @@
 #include<mpi.h>
 #include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
 
 #define msg_size 256
 

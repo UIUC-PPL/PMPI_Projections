@@ -6,27 +6,11 @@
 my %funcsToIgnore = ("MPI_Init" => true,  
 		     "MPI_Initialized" => true,
 		     "MPI_Finalize" => true,
+		     "MPI_Finalized" => true,
 		     "MPI_Pcontrol" => true,
 		     "MPI_Unpack_external" => true,
 		    );
 
-my %funcsToInclude = (
-		      "MPI_Send" => true,
-		      "MPI_Recv" => true,
-		      "MPI_Isend" => true,
-		      "MPI_Irecv" => true,
-		      "MPI_Wait" => true,
-		      "MPI_Comm_rank" => true,
-		      "MPI_Comm_size" => true,
-		      "MPI_Barrier" => true,
-		      "MPI_Reduce" => true,
-		      "MPI_Allreduce" => true,
-		      "MPI_Wtime" => true,
-		      "" => true,
-		      "" => true,
-		      "" => true,
-
-		     );
 
 
 $definedEventIds = "";
@@ -118,13 +102,12 @@ while ($line = <>){
       #    print "$untypedparams\n";
       
       
-      
       $definedEventIds .= "#define $funcEvent $eventCounter\n";
       
       $stsEvents .= "EVENT $eventCounter $func \n";
       
 
-    if (!( exists  $funcsToIgnore{ $func }) ) {
+    if (!( exists  $funcsToIgnore{ $func }) && $eventCounter < 500 ) {
 
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";

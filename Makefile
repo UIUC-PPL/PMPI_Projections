@@ -1,8 +1,13 @@
 # (c) 2009 Isaac Dooley
 
-#MPI_DIR = $(HOME)/local/mpich2/
-#MPICH_INC = -I$(MPI_DIR)/include
-#MPICH_LIB =  
+# ------------------------------------------------
+# Enable one of the following files. 
+# For MPI 1 routines: 
+MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
+# For MPI 2 routines: 
+#MPI_PROTOTYPES_FILE = mpi.h-v2-sanitized
+# ------------------------------------------------
+
 
 # USE_STACK = -D__USE_STACK_TRACE_TO_IDENTIFY_TASKS__
 
@@ -12,7 +17,7 @@ MPICXX = mpicxx -g
 CC = gcc -g
 CXX = g++ -g
 
-TARGETS = testprogram stack_test
+TARGETS = testprogram 
 objs = testprogram.o PMPI_ProjectionsLogging.o
 
 all : $(TARGETS)
@@ -32,18 +37,22 @@ testprogram.o : testprogram.c Makefile
 testprogram : testprogram.o PMPI_ProjectionsLogging.o Makefile source_location.o generated-definitions.o
 	$(MPICXX) PMPI_ProjectionsLogging.o testprogram.o source_location.o generated-definitions.o $(MPICH_LIB) -o testprogram 
 
+testprogram-no-PMPI : testprogram.o Makefile source_location.o
+	$(MPICXX) testprogram.o source_location.o  $(MPICH_LIB) -o testprogram-no-PMPI 
+
+
 stack_test : stack_test.C source_location.o
 	$(CXX) stack_test.C -o stacktest source_location.o
 
 test : testprogram
 	mpirun -n 4 ./testprogram
 
-test-full : testprogram-full
-	mpirun -n 4 ./testprogram-full
+test-no-PMPI : testprogram-full
+	mpirun -n 4 ./testprogram-no-PMPI
 
 
-generated-definitions.C generated-eventids.h : mpi.h-sanitized generate_pmpi_wrappers.pl
-	 perl generate_pmpi_wrappers.pl mpi.h-sanitized 
+generated-definitions.C generated-eventids.h : $(MPI_PROTOTYPES_FILE) generate_pmpi_wrappers.pl
+	 perl generate_pmpi_wrappers.pl  $(MPI_PROTOTYPES_FILE)
 
 
 
