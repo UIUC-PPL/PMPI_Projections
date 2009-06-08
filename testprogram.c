@@ -8,11 +8,11 @@
 
 double *workarray;
 #define ARRSIZE 1024
-#define NWORKITER 2
-#define NITER 10
+#define NWORKITER 100
+#define NITER 5
 
 void do_work(){
-  for(int iter = 0; iter<NITER;iter++){
+  for(int iter = 0; iter<NWORKITER;iter++){
     for(int i=0;i<ARRSIZE;i++){
       workarray[i] = 0.5 * workarray[(i*7) % ARRSIZE] +  0.5 * workarray[(i*11) % ARRSIZE];
     }
@@ -57,14 +57,8 @@ int main(int argc, char ** argv){
 	      MPI_Recv(message_r, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &status); 
 	      MPI_Send(message_s, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD);
 	    }
-	    
-	    
-	    do_work();
-
-	    if(i > NITER/2){
-	      MPI_Barrier(MPI_COMM_WORLD);
-	    }
-	    
+	  
+	    do_work();	    
 	  }
 	  
 	  
