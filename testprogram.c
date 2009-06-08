@@ -1,14 +1,15 @@
-#include<mpi.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<assert.h>
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <unistd.h>
 
 #define msg_size 256
 
 double *workarray;
 #define ARRSIZE 1024
 #define NWORKITER 2
-#define NITER 3
+#define NITER 10
 
 void do_work(){
   for(int iter = 0; iter<NITER;iter++){
@@ -16,6 +17,8 @@ void do_work(){
       workarray[i] = 0.5 * workarray[(i*7) % ARRSIZE] +  0.5 * workarray[(i*11) % ARRSIZE];
     }
   }
+  assert(workarray[7] > 0.0);
+  usleep(10);
 }
 
 
@@ -36,6 +39,8 @@ int main(int argc, char ** argv){
 	  MPI_Init( &argc, &argv );
 	  
 	  workarray = new double[ARRSIZE];
+	  for(int i=0;i<ARRSIZE;i++)
+	    workarray[i] = i;
 
 	  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	  MPI_Comm_size( MPI_COMM_WORLD, &np );
@@ -65,6 +70,7 @@ int main(int argc, char ** argv){
 	  
 	  MPI_Barrier(MPI_COMM_WORLD); 
 
+	  do_work();
 	 
 	  if(rank % 2 == 0) {
 	    MPI_Isend(message_s, msg_size, MPI_CHAR, rank+1, 0, MPI_COMM_WORLD, &req_send);
@@ -73,13 +79,21 @@ int main(int argc, char ** argv){
 	    MPI_Irecv(message_r, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &req_recv); 
 	    MPI_Isend(message_s, msg_size, MPI_CHAR, rank-1, 0, MPI_COMM_WORLD, &req_send);
 	  }
-	  
+
+	  do_work();
+
 	  MPI_Wait ( &req_send, &status);
+	  
+	  do_work();
+ 
 	  MPI_Wait ( &req_recv, &status);
 
 	  
 	  MPI_Barrier(MPI_COMM_WORLD); 
 	  
+	  
+	  do_work();
+
 	  reduce_send_buf = (int*)malloc(5 * sizeof(int));
 	  reduce_recv_buf = (int*)malloc(5 * sizeof(int));
 
@@ -87,6 +101,9 @@ int main(int argc, char ** argv){
 	    reduce_send_buf[i] = rank;
 
 	  MPI_Allreduce((void*)reduce_send_buf, (void*)reduce_recv_buf, 5, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+
+	  do_work();
 
 	  for(int i=0;i<5;i++){
 	    assert(reduce_recv_buf[i] == (np*(np-1))/2);
@@ -99,6 +116,7 @@ int main(int argc, char ** argv){
 	  MPI_Barrier(MPI_COMM_WORLD); 
 
 
+	  do_work();
 
 
 	  reduce_send_buf = (int*)malloc(5 * sizeof(int));
@@ -110,6 +128,9 @@ int main(int argc, char ** argv){
 	  int root = 3;
 	  MPI_Reduce((void*)reduce_send_buf, (void*)reduce_recv_buf, 5, MPI_INT, MPI_SUM, root, MPI_COMM_WORLD);
 
+	  
+	  do_work();
+
 	  if(root == rank){
 	    for(int i=0;i<5;i++){
 	      assert(reduce_recv_buf[i] == (np*(np-1))/2);
@@ -119,6 +140,8 @@ int main(int argc, char ** argv){
 	  free(reduce_send_buf);
 	  free(reduce_recv_buf);
 
+	  
+	  do_work();
 
 	  MPI_Barrier(MPI_COMM_WORLD); 
 	  printf("[%d] Program completed\n", rank);

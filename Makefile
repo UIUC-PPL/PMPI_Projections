@@ -32,7 +32,7 @@ generated-definitions.o : generated-definitions.C  generated-eventids.h PMPI_Pro
 	$(MPICXX) -c generated-definitions.C -o generated-definitions.o $(MPICH_INC) 
 
 testprogram.o : testprogram.c Makefile
-	$(MPICXX) -c testprogram.c
+	$(MPICXX) -c testprogram.c -O0 -g
 
 testprogram : testprogram.o PMPI_ProjectionsLogging.o Makefile source_location.o generated-definitions.o
 	$(MPICXX) PMPI_ProjectionsLogging.o testprogram.o source_location.o generated-definitions.o $(MPICH_LIB) -o testprogram 
