@@ -6,25 +6,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <execinfo.h>
 
 #include "source_location.h"
+#include "PMPI_ProjectionsLogging.h"
 
 #define OUTBUFSIZE 1024*1024*4
 
-#define MPI_Send_user_event 0
-#define MPI_Recv_user_event 1
-#define MPI_Init_user_event 2
-#define MPI_Finalize_user_event 3
-#define MPI_Barrier_user_event 4
-#define MPI_ISend_user_event 5
-#define MPI_IRecv_user_event 6
-#define MPI_Allreduce_user_event 7
-#define MPI_Reduce_user_event 8
-#define MPI_Wait_user_event 9
-#define MPI_Waitall_user_event 10
-
-int NUM_EVENTS = 11;
 
 long records_since_flush = 0;
 char *out_buf;
@@ -73,17 +62,13 @@ void writeSts(){
 	}
 	stsfile << "MESSAGE 0 0\n";
 	stsfile << "MESSAGE 1 0\n";
-	stsfile << "EVENT " << MPI_Send_user_event  << " MPI_Send\n";
-	stsfile << "EVENT " << MPI_Recv_user_event  << " MPI_Recv\n";
-	stsfile << "EVENT " << MPI_Init_user_event  << " MPI_Init\n";
-	stsfile << "EVENT " << MPI_Finalize_user_event  << " MPI_Finalize\n";
-	stsfile << "EVENT " << MPI_Barrier_user_event << " MPI_Barrier\n";
-	stsfile << "EVENT " << MPI_ISend_user_event  << " MPI_ISend\n";
-	stsfile << "EVENT " << MPI_IRecv_user_event  << " MPI_IRecv\n";
-	stsfile << "EVENT " << MPI_Allreduce_user_event << " MPI_Allreduce\n";
-	stsfile << "EVENT " << MPI_Reduce_user_event  << " MPI_Reduce\n";
-	stsfile << "EVENT " << MPI_Wait_user_event << " MPI_Wait\n";
-	stsfile << "EVENT " << MPI_Waitall_user_event << " MPI_Waitall\n";
+
+	std::ifstream eventlist("generated-stsEvents.txt");
+	std::ostringstream buffer;
+	buffer << eventlist.rdbuf();
+
+	stsfile << buffer.str();
+
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";
 	
@@ -122,7 +107,7 @@ void write_log_footer(){
 
 
 /// Write out the bracketed user event when it finishes
-void write_USER_EVENT_PAIR(int userEventID, long startTime){
+void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
 	int event = 0;
 	int pe = rank;
@@ -134,7 +119,7 @@ void write_USER_EVENT_PAIR(int userEventID, long startTime){
 }
 
 /// Write out a user event
-void write_USER_EVENT(int userEventID){
+void write_EVENT(int userEventID){
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
@@ -200,110 +185,9 @@ void write_USER_SUPPLIED(int value){
 }
 
 
-int MPI_Barrier(MPI_Comm comm) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Barrier(comm);
-	write_USER_EVENT_PAIR(MPI_Barrier_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
 
 
-int MPI_Send(void * buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Send(buf, count, datatype, dest, tag, comm);
-	write_USER_EVENT_PAIR(MPI_Send_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
 
-int MPI_Recv(void* buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Status * status){
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Recv(buf, count, datatype, dest, tag, comm, status);
-	write_USER_EVENT_PAIR(MPI_Recv_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Isend(buf, count, datatype, dest, tag, comm, request);
-	write_USER_EVENT_PAIR(MPI_ISend_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Irecv(buf, count, datatype, source, tag, comm, request);
-	write_USER_EVENT_PAIR(MPI_IRecv_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Allreduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm);
-	write_USER_EVENT_PAIR(MPI_Allreduce_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Reduce(sendbuf, recvbuf, count, datatype, op, root, comm);
-	write_USER_EVENT_PAIR(MPI_Reduce_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Wait(MPI_Request *request, MPI_Status *status) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Wait(request, status);
-	write_USER_EVENT_PAIR(MPI_Wait_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
-
-
-int MPI_Waitall(int count, MPI_Request *array_of_requests, MPI_Status *array_of_statuses) {
-	write_END_PROCESSING();
-	
-	long startTime = time_us();
-	int ret = PMPI_Waitall(count,  array_of_requests, array_of_statuses);
-	write_USER_EVENT_PAIR(MPI_Waitall_user_event, startTime);
-	
-	write_BEGIN_PROCESSING();
-	return ret;
-}
 
 
 
@@ -331,13 +215,13 @@ int MPI_Init(int * p1, char *** p2){
 	write_log_header();
 	
 	write_BEGIN_PROCESSING();
-	write_USER_EVENT(MPI_Init_user_event);
+	write_EVENT(MPI_Init_event);
 	
 	return ret;
 }
 
 int MPI_Finalize(void){
-	write_USER_EVENT(MPI_Finalize_user_event);
+	write_EVENT(MPI_Finalize_event);
 	write_END_PROCESSING();
 	write_log_footer();
 	writeToDisk();
@@ -377,5 +261,4 @@ int MPI_Finalize(void){
 	int ret = PMPI_Finalize();
 	return ret;
 }
-
 
