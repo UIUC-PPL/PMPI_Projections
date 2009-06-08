@@ -133,9 +133,6 @@ int main(int argc, char ** argv){
 	  free(reduce_send_buf);
 	  free(reduce_recv_buf);
 
-	  
-	  do_work();
-
 	  MPI_Barrier(MPI_COMM_WORLD); 
 	  printf("[%d] Program completed\n", rank);
 	  MPI_Finalize();
