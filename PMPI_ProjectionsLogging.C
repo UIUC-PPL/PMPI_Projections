@@ -64,12 +64,9 @@ void writeSts(){
 	}
 	stsfile << "MESSAGE 0 0\n";
 	stsfile << "MESSAGE 1 0\n";
-
-	std::ifstream eventlist("generated-stsEvents.txt");
-	std::ostringstream buffer;
-	buffer << eventlist.rdbuf();
-
-	stsfile << buffer.str();
+	
+	// Call the function from generated-stsEvents.C that fills in all the "EVENT" records
+	generateStsEvents(stsfile);
 
 	stsfile << "TOTAL_FUNCTIONS 0 \n";
 	stsfile << "END\n";

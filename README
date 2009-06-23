@@ -1,0 +1,15 @@
+// (c) 2009 Isaac Dooley
+
+
+This library generates Projections traces from MPI programs.
+
+To use it, build the library with "make libpmpiprojections.a". Then link this static library in with your MPI program with "-lpmpiprojections", possibly with a "-L" flag pointing to this directory. 
+
+Try building and running a test program included here with "make test". If your MPI implementation is setup properly, the test should succeed.
+
+If the test fails, you can eliminate any methods that are not available for tracing by removing them from the file "mpi.h-v1-sanitized".
+
+If you wish to trace more newer MPI 2 functions, then uncomment the MPI_PROTOTYPES_FILE definition in the Makefile to point to the larger set of MPI 2 routines.
+
+When the MPI program is run, it will output Projections trace files to the working directory.
+

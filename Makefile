@@ -18,27 +18,34 @@ CC = gcc -g
 CXX = g++ -g
 
 TARGETS = testprogram 
-objs = testprogram.o PMPI_ProjectionsLogging.o
+LIBOBJS =  PMPI_ProjectionsLogging.o generated-definitions.o generated-stsEvents.o source_location.o
 
 all : $(TARGETS)
+
+libpmpiprojections.a : $(LIBOBJS)
+	ar rvs libpmpiprojections.a $(LIBOBJS)
+#	ranlib libpmpiprojections.a 
 
 source_location.o : source_location.c source_location.h
 	$(CC) -c source_location.c
 
-PMPI_ProjectionsLogging.o : PMPI_ProjectionsLogging.C Makefile source_location.o generated-eventids.h PMPI_ProjectionsLogging.h
+PMPI_ProjectionsLogging.o : PMPI_ProjectionsLogging.C Makefile source_location.o generated-eventids.h PMPI_ProjectionsLogging.h 
 	$(MPICXX) -c PMPI_ProjectionsLogging.C -o PMPI_ProjectionsLogging.o $(MPICH_INC) 
 
 generated-definitions.o : generated-definitions.C  generated-eventids.h PMPI_ProjectionsLogging.h
 	$(MPICXX) -c generated-definitions.C -o generated-definitions.o $(MPICH_INC) 
 
+generated-stsEvents.o : generated-stsEvents.C
+	$(MPICXX) -c generated-stsEvents.C -o generated-stsEvents.o $(MPICH_INC) 
+
 testprogram.o : testprogram.c Makefile
 	$(MPICXX) -c testprogram.c -O0 -g
 
-testprogram : testprogram.o PMPI_ProjectionsLogging.o Makefile source_location.o generated-definitions.o
-	$(MPICXX) PMPI_ProjectionsLogging.o testprogram.o source_location.o generated-definitions.o $(MPICH_LIB) -o testprogram 
+testprogram :  Makefile libpmpiprojections.a testprogram.o
+	$(MPICXX) testprogram.o  -L. -lpmpiprojections $(MPICH_LIB) -o testprogram 
 
 testprogram-no-PMPI : testprogram.o Makefile source_location.o
-	$(MPICXX) testprogram.o source_location.o  $(MPICH_LIB) -o testprogram-no-PMPI 
+	$(MPICXX) testprogram.o  $(MPICH_LIB) -o testprogram-no-PMPI 
 
 
 stack_test : stack_test.C source_location.o
@@ -51,11 +58,11 @@ test-no-PMPI : testprogram-full
 	mpirun -n 4 ./testprogram-no-PMPI
 
 
-generated-definitions.C generated-eventids.h : $(MPI_PROTOTYPES_FILE) generate_pmpi_wrappers.pl
+generated-definitions.C generated-eventids.h generated-stsEvents.C : $(MPI_PROTOTYPES_FILE) generate_pmpi_wrappers.pl
 	 perl generate_pmpi_wrappers.pl  $(MPI_PROTOTYPES_FILE)
 
 
 
+
 clean : 
-	rm -rf *.o $(TARGETS) *.log $(objs) *.sts *.projrc *~ stacktest.dSYM stacktest generated-definitions.C generated-stsEvents.txt generated-sts.C generated-eventids.h  
- 
+	rm -rf *.o $(TARGETS) *.log $(OBJS) *.sts *.projrc *~ stacktest.dSYM stacktest generated-definitions.C generated-stsEvents.txt generated-sts.C generated-eventids.h   generated-stsEvents.C  libpmpiprojections.a
