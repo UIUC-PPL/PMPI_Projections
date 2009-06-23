@@ -24,7 +24,6 @@ all : $(TARGETS)
 
 libpmpiprojections.a : $(LIBOBJS)
 	ar rvs libpmpiprojections.a $(LIBOBJS)
-#	ranlib libpmpiprojections.a 
 
 source_location.o : source_location.c source_location.h
 	$(CC) -c source_location.c
