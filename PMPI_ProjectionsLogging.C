@@ -258,3 +258,344 @@ int MPI_Finalize(void){
 	return ret;
 }
 
+// FORTRAN bindings
+
+void mpi_init_( MPI_Fint *ierr )
+{
+    *ierr = MPI_Init(NULL, NULL );
+
+}
+
+void mpi_finalize_(int *ierr )
+{
+    *ierr = MPI_Finalize();
+}
+
+
+void mpi_comm_create_(MPI_Fint *comm, MPI_Fint *group, MPI_Fint *newcomm, MPI_Fint *__ierr)
+{
+    *__ierr = MPI_Comm_create((MPI_Comm) *comm, (MPI_Group) *group, (MPI_Comm*)newcomm);
+    
+}
+
+
+int mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
+{
+    *__ierr = MPI_Comm_dup((MPI_Comm) *comm, (MPI_Comm*) newcomm);
+}
+
+int mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
+{
+    *__ierr = MPI_Comm_split((MPI_Comm) *comm, (int) *color, (int) *key, (MPI_Comm*)newcomm);
+}
+
+
+
+void mpi_send_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Send(buf, (int)*count, (MPI_Datatype)*datatype,
+                       (int)*dest, (int)*tag, (MPI_Comm)*comm);
+}
+
+void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                 MPI_Fint *request, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Isend(buf,(int)*count,(MPI_Datatype)*datatype,
+                        (int)*dest,
+                        (int)*tag,(MPI_Comm)*comm,
+                        (MPI_Request*)request);
+}
+
+void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype, 
+                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm, 
+                 MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Bsend( buf, (int)*count, (MPI_Datatype)*datatype,
+                         (int)*dest, (int)*tag, (MPI_Comm)*comm );
+}
+
+void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                  MPI_Fint *request, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Ibsend(buf,(int)*count,(MPI_Datatype)*datatype,
+                         (int)*dest,(int)*tag,(MPI_Comm)*comm,
+                         (MPI_Request*)request);
+}
+
+
+void mpi_rsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                 MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Rsend(buf, (int)*count,(MPI_Datatype)*datatype,
+                        (int)*dest, (int)*tag, (MPI_Comm)*comm);
+}
+
+void mpi_irsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                  MPI_Fint *request, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Irsend(buf,(int)*count,(MPI_Datatype)*datatype,
+                         (int)*dest,(int)*tag,
+                         (MPI_Comm)*comm,(MPI_Request*)request);
+}
+
+
+void mpi_ssend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                 MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Ssend(buf, (int)*count,
+                        (MPI_Datatype)*datatype, (int)*dest, (int)*tag,
+                        (MPI_Comm)*comm);
+}
+
+
+void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
+                  MPI_Fint *request, MPI_Fint *__ierr )
+{
+    
+    *__ierr = MPI_Issend(buf,(int)*count,(MPI_Datatype)*datatype,
+                         (int)*dest, (int)*tag,
+                         (MPI_Comm)*comm,
+                         (MPI_Request*)request);
+}
+
+
+void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+                    MPI_Fint *dest, MPI_Fint *sendtag,
+                    void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
+                    MPI_Fint *source, MPI_Fint *recvtag,
+                    MPI_Fint *comm, MPI_Fint *status, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Sendrecv(sendbuf, (int)*sendcount,
+                           (MPI_Datatype)*sendtype, (int)*dest,
+                           (int)*sendtag, recvbuf,
+                           (int)*recvcount, (MPI_Datatype)*recvtype,
+                           (int)*source, (int)*recvtag,
+                           (MPI_Comm)*comm, (MPI_Status*)status);
+}
+
+
+
+void mpi_sendrecv_replace_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                            MPI_Fint *dest, MPI_Fint *sendtag,
+                            MPI_Fint *source, MPI_Fint *recvtag,
+                            MPI_Fint *comm, MPI_Fint *status,
+                            MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Sendrecv_replace(buf, (int)*count,
+                                   (MPI_Datatype)*datatype, (int)*dest,
+                                   (int)*sendtag, (int)*source, (int)*recvtag,
+                                   (MPI_Comm)*comm, (MPI_Status*)status );
+}
+
+void mpi_start_( MPI_Fint *request, MPI_Fint *__ierr )
+{
+ 
+    *__ierr = MPI_Start( (MPI_Request*)request );
+}
+
+void mpi_startall_( MPI_Fint *count, MPI_Fint array_of_requests[],
+                    MPI_Fint *__ierr )
+{
+
+        *__ierr = MPI_Startall((int)*count,(MPI_Request*)array_of_requests);
+}
+
+
+void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+                      void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
+                      MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Allgather(sendbuf, (int)*sendcount,
+                            (MPI_Datatype)*sendtype,
+                            recvbuf,
+                            (int)*recvcount,
+                            (MPI_Datatype)*recvtype,
+                            (MPI_Comm)*comm);
+}
+
+void mpi_allgatherv_ ( void *sendbuf, MPI_Fint *sendcount,  MPI_Fint *sendtype,
+                       void *recvbuf, MPI_Fint *recvcounts, MPI_Fint *displs,
+                       MPI_Fint *recvtype, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+
+    *__ierr = MPI_Allgatherv(sendbuf, (int)*sendcount,
+                             (MPI_Datatype)*sendtype,
+                             recvbuf, (int*) recvcounts,
+                             (int*)displs, (MPI_Datatype)*recvtype,
+                             (MPI_Comm)*comm);
+}
+
+void mpi_allreduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+                      MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
+                      MPI_Fint *__ierr )
+{
+
+    *__ierr = MPI_Allreduce(sendbuf,recvbuf,
+                            (int)*count, (MPI_Datatype)*datatype,
+                            (MPI_Op)*op, (MPI_Comm)*comm );
+}
+
+void mpi_alltoall_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+                    void *recvbuf, MPI_Fint *recvcnt, MPI_Fint *recvtype,
+                    MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Alltoall(sendbuf, (int)*sendcount,
+                           (MPI_Datatype)*sendtype, recvbuf,
+                           (int)*recvcnt, (MPI_Datatype)*recvtype,
+                           (MPI_Comm)*comm );
+}
+
+void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
+                      MPI_Fint *sdispls, MPI_Fint *sendtype,
+                      void *recvbuf, MPI_Fint *recvcnts,
+                      MPI_Fint *rdispls, MPI_Fint *recvtype,
+                      MPI_Fint *comm, MPI_Fint *__ierr )
+{
+ 
+    *__ierr = MPI_Alltoallv(sendbuf, (int*)sendcnts,
+                            (int*)sdispls, (MPI_Datatype)*sendtype,
+                            recvbuf, (int*)recvcnts,
+                            (int*)rdispls, (MPI_Datatype)*recvtype,
+                            (MPI_Comm)*comm );
+
+}
+
+/* 
+void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
+                      MPI_Fint *sdispls, MPI_Fint *sendtypes,
+                      void *recvbuf, MPI_Fint *recvcnts,
+                      MPI_Fint *rdispls, MPI_Fint *recvtypes,
+                      MPI_Fint *comm, MPI_Fint *__ierr )
+{
+ 
+    *__ierr = MPI_Alltoallw(sendbuf, (int*)sendcnts,
+                            (int*)sdispls, (MPI_Datatype *)(*sendtypes),
+                            recvbuf, (int*)recvcnts,
+                            (int*)rdispls, (MPI_Datatype *)(*recvtypes),
+                            (MPI_Comm)*comm );
+}
+*/
+
+void mpi_barrier_ ( MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Barrier( (MPI_Comm)*comm );
+}
+
+void mpi_bcast_ ( void *buffer, MPI_Fint *count, MPI_Fint *datatype,
+                  MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Bcast(buffer, (int)*count,
+                        (MPI_Datatype)*datatype, (int)*root,
+                        (MPI_Comm)*comm);
+}
+
+void mpi_exscan_ (void *sendbuf, void *recvbuf, MPI_Fint *count,
+                      MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
+                      MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Exscan(sendbuf,recvbuf,
+                         (int)*count, (MPI_Datatype)*datatype,
+                         (MPI_Op)*op, (MPI_Comm)*comm );
+}
+
+void mpi_gather_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+                   void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
+                   MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Gather(sendbuf, (int)*sendcnt,
+                         (MPI_Datatype)*sendtype, recvbuf,
+                         (int)*recvcount, (MPI_Datatype)*recvtype,
+                         (int)*root, (MPI_Comm)*comm);
+}
+
+void mpi_gatherv_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+                    void *recvbuf, MPI_Fint *recvcnts, MPI_Fint *displs,
+                    MPI_Fint *recvtype, MPI_Fint *root, MPI_Fint *comm,
+                    MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Gatherv(sendbuf, (int)*sendcnt,
+                          (MPI_Datatype)*sendtype, recvbuf,
+                          (int*)recvcnts, (int*)displs,
+                          (MPI_Datatype)*recvtype, (int)*root,
+                          (MPI_Comm)*comm);
+}
+
+void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
+                           MPI_Fint *recvcnts, MPI_Fint *datatype,
+                           MPI_Fint *op, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Reduce_scatter(sendbuf,
+                                 recvbuf, (int*)recvcnts,
+                                 (MPI_Datatype)*datatype, (MPI_Op)*op,
+                                 (MPI_Comm)*comm);
+}
+
+/*void mpi_reduce_scatter_block_ ( void *sendbuf, void *recvbuf,
+                                 MPI_Fint *recvcount, MPI_Fint *datatype,
+                                 MPI_Fint *op, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Reduce_scatter_block(sendbuf,
+                                 recvbuf, (int)*recvcount,
+                                 MPI_Type_f2c(*datatype), 
+				 (MPI_Op)*op,
+                                 (MPI_Comm)*comm);
+}*/
+
+void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+                   MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *root,
+                   MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Reduce(sendbuf, recvbuf,
+                         (int)*count, (MPI_Datatype)*datatype,
+                         (MPI_Op)*op, (int)*root,
+                         (MPI_Comm)*comm);
+}
+
+/*void mpi_reduce_local_ ( void *inbuf, void *inoutbuf, MPI_Fint *count,
+                   MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *root,
+                   MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Reduce_local(inbuf, inoutbuf,
+                               (int)*count, (MPI_Datatype)*datatype,
+                               (MPI_Op)*op);
+}*/
+
+void mpi_scan_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+                 MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
+                 MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Scan(sendbuf, recvbuf,
+                       (int)*count, (MPI_Datatype)*datatype,
+                       (MPI_Op)*op, (MPI_Comm)*comm);
+}
+
+void mpi_scatter_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+                    void *recvbuf, MPI_Fint *recvcnt, MPI_Fint *recvtype,
+                    MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Scatter(sendbuf, (int)*sendcnt,
+                          (MPI_Datatype)*sendtype, recvbuf,
+                          (int)*recvcnt, (MPI_Datatype)*recvtype,
+                          (int)*root, (MPI_Comm)*comm);
+}
+
+void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
+                     MPI_Fint *displs, MPI_Fint *sendtype,
+                     void *recvbuf, MPI_Fint *recvcnt, 
+                     MPI_Fint *recvtype, MPI_Fint *root,
+                     MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Scatterv(sendbuf, (int*)sendcnts, (int*)displs,
+                           (MPI_Datatype)*sendtype, recvbuf,
+                           (int)*recvcnt, (MPI_Datatype)*recvtype,
+                           (int)*root, (MPI_Comm)*comm );
+}
+
