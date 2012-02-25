@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <execinfo.h>
+#include <stdlib.h>
 
 #include "source_location.h"
 #include "PMPI_ProjectionsLogging.h"
