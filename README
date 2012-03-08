@@ -13,3 +13,9 @@ If you wish to trace more newer MPI 2 functions, then uncomment the MPI_PROTOTYP
 
 When the MPI program is run, it will output Projections trace files to the working directory.
 
+
+Fortran specific directions:
+
+When linking with Fortran code, you may need to link libmpi_cxx and libstdc++
+
+e.g. mpif90 hworld.f90 -lmpi_cxx -lstdc++ -lpmpiprojections
