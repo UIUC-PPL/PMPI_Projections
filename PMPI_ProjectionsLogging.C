@@ -555,7 +555,7 @@ void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
                       MPI_Fint *rdispls, MPI_Fint *recvtypes,
                       MPI_Fint *comm, MPI_Fint *__ierr )
 {
- 
+    //TODO: use MPI_Type_f2c for MPI_Datatype arrays 
     *__ierr = MPI_Alltoallw(sendbuf, (int*)sendcnts,
                             (int*)sdispls, (MPI_Datatype *)(*sendtypes),
                             recvbuf, (int*)recvcnts,
