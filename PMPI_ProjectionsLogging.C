@@ -442,9 +442,9 @@ void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                     MPI_Fint *comm, MPI_Fint *status, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Sendrecv(sendbuf, (int)*sendcount,
-                           (MPI_Datatype)*sendtype, (int)*dest,
+                           MPI_Type_f2c(*sendtype), (int)*dest,
                            (int)*sendtag, recvbuf,
-                           (int)*recvcount, (MPI_Datatype)*recvtype,
+                           (int)*recvcount, MPI_Type_f2c(*recvtype),
                            (int)*source, (int)*recvtag,
                            MPI_Comm_f2c(*comm), (MPI_Status*)status);
 }
@@ -482,10 +482,10 @@ void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                       MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Allgather(sendbuf, (int)*sendcount,
-                            (MPI_Datatype)*sendtype,
+                            MPI_Type_f2c(*sendtype),
                             recvbuf,
                             (int)*recvcount,
-                            (MPI_Datatype)*recvtype,
+                            MPI_Type_f2c(*recvtype),
                             MPI_Comm_f2c(*comm));
 }
 
@@ -495,9 +495,9 @@ void mpi_allgatherv_ ( void *sendbuf, MPI_Fint *sendcount,  MPI_Fint *sendtype,
 {
 
     *__ierr = MPI_Allgatherv(sendbuf, (int)*sendcount,
-                             (MPI_Datatype)*sendtype,
+                             MPI_Type_f2c(*sendtype),
                              recvbuf, (int*) recvcounts,
-                             (int*)displs, (MPI_Datatype)*recvtype,
+                             (int*)displs, MPI_Type_f2c(*recvtype),
                              MPI_Comm_f2c(*comm));
 }
 
@@ -516,8 +516,8 @@ void mpi_alltoall_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                     MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Alltoall(sendbuf, (int)*sendcount,
-                           (MPI_Datatype)*sendtype, recvbuf,
-                           (int)*recvcnt, (MPI_Datatype)*recvtype,
+                           MPI_Type_f2c(*sendtype), recvbuf,
+                           (int)*recvcnt, MPI_Type_f2c(*recvtype),
                            MPI_Comm_f2c(*comm) );
 }
 
@@ -529,9 +529,9 @@ void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
 {
  
     *__ierr = MPI_Alltoallv(sendbuf, (int*)sendcnts,
-                            (int*)sdispls, (MPI_Datatype)*sendtype,
+                            (int*)sdispls, MPI_Type_f2c(*sendtype),
                             recvbuf, (int*)recvcnts,
-                            (int*)rdispls, (MPI_Datatype)*recvtype,
+                            (int*)rdispls, MPI_Type_f2c(*recvtype),
                             MPI_Comm_f2c(*comm) );
 
 }
@@ -579,8 +579,8 @@ void mpi_gather_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                    MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Gather(sendbuf, (int)*sendcnt,
-                         (MPI_Datatype)*sendtype, recvbuf,
-                         (int)*recvcount, (MPI_Datatype)*recvtype,
+                         MPI_Type_f2c(*sendtype), recvbuf,
+                         (int)*recvcount, MPI_Type_f2c(*recvtype),
                          (int)*root, MPI_Comm_f2c(*comm));
 }
 
@@ -590,9 +590,9 @@ void mpi_gatherv_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                     MPI_Fint *__ierr )
 {
     *__ierr = MPI_Gatherv(sendbuf, (int)*sendcnt,
-                          (MPI_Datatype)*sendtype, recvbuf,
+                          MPI_Type_f2c(*sendtype), recvbuf,
                           (int*)recvcnts, (int*)displs,
-                          (MPI_Datatype)*recvtype, (int)*root,
+                          MPI_Type_f2c(*recvtype), (int)*root,
                           MPI_Comm_f2c(*comm));
 }
 
@@ -650,8 +650,8 @@ void mpi_scatter_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                     MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Scatter(sendbuf, (int)*sendcnt,
-                          (MPI_Datatype)*sendtype, recvbuf,
-                          (int)*recvcnt, (MPI_Datatype)*recvtype,
+                          MPI_Type_f2c(*sendtype), recvbuf,
+                          (int)*recvcnt, MPI_Type_f2c(*recvtype),
                           (int)*root, MPI_Comm_f2c(*comm));
 }
 
@@ -662,8 +662,8 @@ void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
                      MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Scatterv(sendbuf, (int*)sendcnts, (int*)displs,
-                           (MPI_Datatype)*sendtype, recvbuf,
-                           (int)*recvcnt, (MPI_Datatype)*recvtype,
+                           MPI_Type_f2c(*sendtype), recvbuf,
+                           (int)*recvcnt, MPI_Type_f2c(*recvtype),
                            (int)*root, MPI_Comm_f2c(*comm) );
 }
 }
