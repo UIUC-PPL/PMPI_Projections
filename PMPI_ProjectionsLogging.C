@@ -481,12 +481,14 @@ void mpi_start_( MPI_Fint *request, MPI_Fint *__ierr )
     *__ierr = MPI_Start( &reqC );
 }
 
+/*
 void mpi_startall_( MPI_Fint *count, MPI_Fint array_of_requests[],
                     MPI_Fint *__ierr )
 {
-
+	//TODO: Use MPI_Request_f2c to handle requests
         *__ierr = MPI_Startall((int)*count,(MPI_Request*)array_of_requests);
 }
+*/
 
 
 void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
