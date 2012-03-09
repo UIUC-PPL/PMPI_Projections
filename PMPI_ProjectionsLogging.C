@@ -280,6 +280,7 @@ void mpi_comm_create_(MPI_Fint *comm, MPI_Fint *group, MPI_Fint *newcomm, MPI_Fi
 {
     MPI_Comm newcommC = MPI_Comm_f2c(*newcomm);
     *__ierr = MPI_Comm_create(MPI_Comm_f2c(*comm), MPI_Group_f2c(*group), &newcommC);
+    *newcomm = MPI_Comm_c2f(newcommC);
 }
 
 
@@ -287,15 +288,24 @@ int mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
 {
     MPI_Comm newcommC = MPI_Comm_f2c(*newcomm);
     *__ierr = MPI_Comm_dup(MPI_Comm_f2c(*comm), &newcommC);
+    *newcomm = MPI_Comm_c2f(newcommC);
 }
 
 int mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
 {
     MPI_Comm newcommC = MPI_Comm_f2c(*newcomm);
     *__ierr = MPI_Comm_split(MPI_Comm_f2c(*comm), (int) *color, (int) *key, &newcommC);
+    *newcomm = MPI_Comm_c2f(newcommC);
 }
 
-
+/*
+void mpi_comm_free_ ( MPI_Fint *comm, MPI_Fint *__ierr )
+{
+    MPI_Comm commC = MPI_Comm_f2c(*comm);
+    *__ierr = MPI_Comm_free( &commC );
+    *comm = MPI_Comm_c2f(commC);
+}
+*/
 
 void mpi_send_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
@@ -313,6 +323,7 @@ void mpi_recv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     MPI_Status_f2c(status,&statusC);
     *__ierr = MPI_Recv(buf, (int)*count, MPI_Type_f2c(*datatype),
                        (int)*src, (int)*tag, MPI_Comm_f2c(*comm), &statusC);
+    MPI_Status_c2f(&statusC,status);
 }
 
 void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -324,6 +335,7 @@ void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                         (int)*dest,
                         (int)*tag,MPI_Comm_f2c(*comm),
                         &reqC);
+    *request = MPI_Request_c2f(reqC);
 }
 void mpi_irecv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                 MPI_Fint *src, MPI_Fint *tag, MPI_Fint *comm,
@@ -332,6 +344,7 @@ void mpi_irecv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     MPI_Request reqC = MPI_Request_f2c(*request);
     *__ierr = MPI_Irecv(buf, (int)*count, MPI_Type_f2c(*datatype),
                        (int)*src, (int)*tag, MPI_Comm_f2c(*comm),&reqC);
+    *request = MPI_Request_c2f(reqC);
 }
 
 void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype, 
@@ -349,6 +362,7 @@ void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     MPI_Status_f2c(status,&statusC);
     *__ierr = MPI_Brecv(buf, (int)*count, MPI_Type_f2c(*datatype),
                        (int)*dest, (int)*tag, MPI_Comm_f2c(*comm), &statusC);
+    MPI_Status_c2f(&statusC,status);
 }*/
 
 void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -359,6 +373,7 @@ void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     *__ierr = MPI_Ibsend(buf,(int)*count,MPI_Type_f2c(*datatype),
                          (int)*dest,(int)*tag,MPI_Comm_f2c(*comm),
                          &reqC);
+    *request = MPI_Request_c2f(reqC);
 }
 
 /*void mpi_ibrecv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -395,6 +410,7 @@ void mpi_irsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     *__ierr = MPI_Irsend(buf,(int)*count,MPI_Type_f2c(*datatype),
                          (int)*dest,(int)*tag,
                          MPI_Comm_f2c(*comm),&reqC);
+    *request = MPI_Request_c2f(reqC);
 }
 
 /*void mpi_irrecv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -422,6 +438,7 @@ void mpi_ssend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
     MPI_Status_f2c(status,&statusC);
     *__ierr = MPI_Srecv(buf, (int)*count, MPI_Type_f2c(*datatype),
                        (int)*dest, (int)*tag, MPI_Comm_f2c(*comm), &statusC);
+    MPI_Status_c2f(&statusC,status);
 }*/
 
 void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -433,6 +450,7 @@ void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                          (int)*dest, (int)*tag,
                          MPI_Comm_f2c(*comm),
                          &reqC);
+    *request = MPI_Request_c2f(reqC);
 }
 
 /*void mpi_isrecv_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
@@ -457,6 +475,7 @@ void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                            (int)*recvcount, MPI_Type_f2c(*recvtype),
                            (int)*source, (int)*recvtag,
                            MPI_Comm_f2c(*comm), &statusC );
+    MPI_Status_c2f(&statusC,status);
 }
 
 
@@ -473,12 +492,14 @@ void mpi_sendrecv_replace_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                                    MPI_Type_f2c(*datatype), (int)*dest,
                                    (int)*sendtag, (int)*source, (int)*recvtag,
                                    MPI_Comm_f2c(*comm), &statusC );
+    MPI_Status_c2f(&statusC,status);
 }
 
 void mpi_start_( MPI_Fint *request, MPI_Fint *__ierr )
 {
     MPI_Request reqC = MPI_Request_f2c(*request); 
     *__ierr = MPI_Start( &reqC );
+    *request = MPI_Request_c2f(reqC);
 }
 
 /*
