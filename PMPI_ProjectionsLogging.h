@@ -14,6 +14,8 @@ void write_EVENT_PAIR(int userEventID, long startTime);
 void write_EVENT(int userEventID);
 void write_BEGIN_PROCESSING();
 void write_END_PROCESSING();
+void write_BEGIN_IDLE();
+void write_END_IDLE();
 void write_USER_SUPPLIED(int value);
 long time_us();
 

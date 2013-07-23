@@ -136,6 +136,29 @@ void write_EVENT(int userEventID){
 	flush();
 }
 
+void write_BEGIN_IDLE() 
+{
+	int entry = source_location_int();
+	long time = time_us();
+	recentSourceLocation = entry;
+    sprintf(curr_buf_position, "14 %ld %d\n", time, rank);
+    curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+	source_locations.insert(entry);
+} 
+
+void write_END_IDLE() 
+{
+	int entry = source_location_int();
+	long time = time_us();
+	recentSourceLocation = entry;
+    sprintf(curr_buf_position, "15 %ld %d\n", time, rank);
+    curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+	source_locations.insert(entry);
+}
 void write_BEGIN_PROCESSING(){
 	
 	int mtype = 0;
@@ -151,16 +174,14 @@ void write_BEGIN_PROCESSING(){
 	int id3 = 0;
 	long cpuStartTime = 0;
 	int numPerfCounts = 0;
-	
+
 	recentSourceLocation = entry;
 
 	//	std::cout << "entry=" << entry << std::endl;
-
 	sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
-	
 	source_locations.insert(entry);
 //	printf("%d    TotalSoFar=%d\n", entry, source_locations.size());
 	
@@ -175,9 +196,9 @@ void write_END_PROCESSING(){
 	int msglen = 0;
 	long cpuEndTime = 0;
 	int numPerfCounts = 0;
-		
-	sprintf(curr_buf_position, "3 %d %d %ld %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );
-	curr_buf_position += strlen(curr_buf_position);	// Advance pointer to what we just wrote
+	
+    sprintf(curr_buf_position, "3 %d %d %ld %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );	
+	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
 }

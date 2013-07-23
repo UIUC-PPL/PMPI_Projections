@@ -120,10 +120,12 @@ while ($line = <>){
 
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\twrite_BEGIN_IDLE();\n";
       $funcDefinitions .= "\tlong startTime = time_us();\n";
       $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
       $funcDefinitions .= "\twrite_EVENT_PAIR($funcEvent, startTime);\n";
       
+      $funcDefinitions .= "\twrite_END_IDLE();\n";
       $funcDefinitions .= "\twrite_BEGIN_PROCESSING();\n";
       $funcDefinitions .= "\treturn ret;\n";
       
