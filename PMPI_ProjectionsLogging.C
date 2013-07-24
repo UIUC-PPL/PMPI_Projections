@@ -24,6 +24,54 @@
 #define EXTERN_C 
 #endif
 
+#define  CREATION           1
+#define  BEGIN_PROCESSING   2
+#define  END_PROCESSING     3
+#define  ENQUEUE            4
+#define  DEQUEUE            5
+#define  BEGIN_COMPUTATION  6
+#define  END_COMPUTATION    7
+#define  BEGIN_INTERRUPT    8
+#define  END_INTERRUPT      9
+#define  MESSAGE_RECV       10
+#define  BEGIN_TRACE        11
+#define  END_TRACE          12
+#define  USER_EVENT         13
+#define  BEGIN_IDLE         14
+#define  END_IDLE           15
+#define  BEGIN_PACK         16
+#define  END_PACK           17
+#define  BEGIN_UNPACK       18
+#define  END_UNPACK         19
+#define  CREATION_BCAST     20
+
+#define  CREATION_MULTICAST 21
+ 
+#define  BEGIN_FUNC         22
+#define  END_FUNC           23
+
+/* Memory tracing */
+#define  MEMORY_MALLOC      24
+#define  MEMORY_FREE        25
+
+/* Trace user supplied data */
+#define USER_SUPPLIED       26
+
+/* Trace memory usage */
+#define MEMORY_USAGE_CURRENT       27
+
+/* Trace user supplied note (text string)  */
+#define USER_SUPPLIED_NOTE       28
+
+/* Trace user supplied note (text string, with start, end times, and user event id)  */
+#define USER_SUPPLIED_BRACKETED_NOTE       29
+
+/* Support for Phases and time-partial logs */
+#define END_PHASE           30
+#define SURROGATE_BLOCK     31 /* inserted by cluster analysis only */
+
+#define  USER_EVENT_PAIR    100
+
 
 long records_since_flush = 0;
 char *out_buf;
@@ -99,14 +147,14 @@ void inline flush(){
 }
 
 void write_log_header(){
-	sprintf(curr_buf_position, "6 0\n");
+	sprintf(curr_buf_position, "%d 0\n", BEGIN_COMPUTATION);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
 }
 
 void write_log_footer(){
-	sprintf(curr_buf_position, "7 %ld\n",time_us());
+	sprintf(curr_buf_position, "%d %ld\n", END_COMPUTATION, time_us());
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -118,7 +166,7 @@ void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
 	int event = 0;
 	int pe = rank;
-	sprintf(curr_buf_position, "100 %d %ld %d %d\n100 %d %ld %d %d\n", userEventID, startTime, event, pe, userEventID, endTime, event, pe);
+	sprintf(curr_buf_position, "%d %d %ld %d %d\n100 %d %ld %d %d\n",USER_EVENT_PAIR, userEventID, startTime, event, pe, userEventID, endTime, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	records_since_flush ++;
@@ -130,7 +178,7 @@ void write_EVENT(int userEventID){
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
-	sprintf(curr_buf_position, "13 %d %ld %d %d\n", userEventID, time, event, pe);
+	sprintf(curr_buf_position, "%d %d %ld %d %d\n", USER_EVENT, userEventID, time, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -141,7 +189,7 @@ void write_BEGIN_IDLE()
 	int entry = source_location_int();
 	long time = time_us();
 	recentSourceLocation = entry;
-    sprintf(curr_buf_position, "14 %ld %d\n", time, rank);
+    sprintf(curr_buf_position, "%d %ld %d\n", BEGIN_IDLE, time, rank);
     curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -153,7 +201,7 @@ void write_END_IDLE()
 	int entry = source_location_int();
 	long time = time_us();
 	recentSourceLocation = entry;
-    sprintf(curr_buf_position, "15 %ld %d\n", time, rank);
+    sprintf(curr_buf_position, "%d %ld %d\n", END_IDLE, time, rank);
     curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -178,7 +226,7 @@ void write_BEGIN_PROCESSING(){
 	recentSourceLocation = entry;
 
 	//	std::cout << "entry=" << entry << std::endl;
-	sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
+	sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", BEGIN_PROCESSING, mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -197,7 +245,7 @@ void write_END_PROCESSING(){
 	long cpuEndTime = 0;
 	int numPerfCounts = 0;
 	
-    sprintf(curr_buf_position, "3 %d %d %ld %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );	
+    sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d\n", END_PROCESSING, mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );	
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -206,7 +254,7 @@ void write_END_PROCESSING(){
 
 
 void write_USER_SUPPLIED(int value){
-	sprintf(curr_buf_position, "26 %d\n", value);
+	sprintf(curr_buf_position, "%d %d\n", USER_SUPPLIED, value);
 	curr_buf_position += strlen(curr_buf_position);	// Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
