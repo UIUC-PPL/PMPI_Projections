@@ -40,6 +40,24 @@ void init_time(){
 	initTime = PMPI_Wtime() - 0.001;
 }
 
+int getTypeSize(MPI_Datatype ty)
+{
+        int s;
+        if(ty==MPI_INT) s=sizeof(int);
+        else if(ty==MPI_CHAR) s = sizeof(char);
+        else if(ty==MPI_FLOAT) s = sizeof(float);
+        else if(ty==MPI_SHORT) s = sizeof(short);
+        else if(ty==MPI_LONG) s = sizeof(long);
+        else if(ty==MPI_DOUBLE) s = sizeof(double);
+        else if(ty==MPI_UNSIGNED_CHAR) s = sizeof(unsigned char);
+        else if(ty==MPI_UNSIGNED_SHORT) s = sizeof(unsigned short);
+        else if(ty==MPI_UNSIGNED) s = sizeof(unsigned int);
+        else if(ty==MPI_UNSIGNED_LONG) s = sizeof(unsigned long);
+        else s=-1;        return s;      
+}
+
+
+
 long time_us(){
 	return ((PMPI_Wtime()-initTime)*1000000.0);
 }
@@ -106,7 +124,15 @@ void write_log_footer(){
 	flush();
 }
 
-
+void write_EVENT_PAIR_Comm(int userEventID, long startTime,int count,MPI_Datatype ty){
+	int s=getTypeSize(ty);
+	int pe = rank;
+        sprintf(curr_buf_position, "1 5 0 %ld 0 %d %d 0\n",startTime,pe,s*count);
+        curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+        records_since_flush ++;
+        flush();
+	write_EVENT_PAIR(userEventID,startTime);
+}
 /// Write out the bracketed user event when it finishes
 void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
@@ -130,34 +156,46 @@ void write_EVENT(int userEventID){
 	flush();
 }
 
+void add_BEGIN_PROCESSING_ENTRY(int msglen,int pe){
+        int mtype = 0;
+        int entry = source_location_int();
+        long time = time_us();
+        int event = 0;
+        long recvTime = 0;
+        int id0 = 0;
+        int id1 = 0;
+        int id2 = 0;
+        int id3 = 0;
+        long cpuStartTime = 0;
+        int numPerfCounts = 0;
+
+        recentSourceLocation = entry;
+        //      std::cout << "entry=" << entry << std::endl;
+
+        sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
+        curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+        records_since_flush ++;
+        flush();
+
+        source_locations.insert(entry);
+//      printf("%d    TotalSoFar=%d\n", entry, source_locations.size());
+
+}
+
+void write_BEGIN_PROCESSING_AFTER_RECV(int source,int count,MPI_Datatype datatype){
+
+        int pe = source;
+        int msglen=count*getTypeSize(datatype);
+	printf("Coming in COMM ------- %d\n",getTypeSize(datatype));
+        add_BEGIN_PROCESSING_ENTRY(msglen,pe);
+}
+
+
 void write_BEGIN_PROCESSING(){
 	
-	int mtype = 0;
-	int entry = source_location_int();
-	long time = time_us();
-	int event = 0;
 	int pe = rank;
 	int msglen = 0;
-	long recvTime = 0;
-	int id0 = 0;
-	int id1 = 0;
-	int id2 = 0;
-	int id3 = 0;
-	long cpuStartTime = 0;
-	int numPerfCounts = 0;
-	
-	recentSourceLocation = entry;
-
-	//	std::cout << "entry=" << entry << std::endl;
-
-	sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
-	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
-	records_since_flush ++;
-	flush();
-	
-	source_locations.insert(entry);
-//	printf("%d    TotalSoFar=%d\n", entry, source_locations.size());
-	
+	add_BEGIN_PROCESSING_ENTRY(msglen,pe);	
 }
 
 void write_END_PROCESSING(){

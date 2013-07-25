@@ -29,7 +29,6 @@ $stsEventsFooter = " } \n";
 
 while ($line = <>){
   chomp $line;
-
   if($line =~ /(\S*) MPI_([^(]*)([^;]*)/){
     $returntype = $1;
     $func = "MPI_$2";
@@ -115,8 +114,39 @@ while ($line = <>){
       
       $stsEvents .= "\tstsfile << \"EVENT $eventCounter $func\" << std::endl ; \n";
       
+    if($func eq 'MPI_Send')
+    {
+      $funcDefinitions .= "$returntype $func $typedparams {\n";
+      $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\tlong startTime = time_us();\n";
+      $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
+      $funcDefinitions .= "\twrite_EVENT_PAIR_Comm($funcEvent, startTime,count,datatype);\n";
 
-    if (!( exists  $funcsToIgnore{ $func }) && $eventCounter < 500 ) {
+      $funcDefinitions .= "\twrite_BEGIN_PROCESSING();\n";
+      $funcDefinitions .= "\treturn ret;\n";
+
+      $funcDefinitions .= "}\n\n\n";
+
+      $numFuncDefinitions ++;
+
+    }
+    elsif($func eq 'MPI_Recv')
+    {
+      $funcDefinitions .= "$returntype $func $typedparams {\n";
+      $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\tlong startTime = time_us();\n";
+      $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
+      $funcDefinitions .= "\twrite_EVENT_PAIR_Comm($funcEvent, startTime,count,datatype);\n";
+
+      $funcDefinitions .= "\twrite_BEGIN_PROCESSING_AFTER_RECV(source,count,datatype);\n";
+      $funcDefinitions .= "\treturn ret;\n";
+
+      $funcDefinitions .= "}\n\n\n";
+
+      $numFuncDefinitions ++;
+
+    }
+    elsif (!( exists  $funcsToIgnore{ $func }) && $eventCounter < 500 ) {
 
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";
