@@ -16,6 +16,8 @@ void write_EVENT(int userEventID);
 void write_BEGIN_PROCESSING();
 void write_BEGIN_PROCESSING_AFTER_RECV(int source,int count,MPI_Datatype datatype);
 void write_END_PROCESSING();
+void write_BEGIN_IDLE();
+void write_END_IDLE();
 void write_USER_SUPPLIED(int value);
 long time_us();
 

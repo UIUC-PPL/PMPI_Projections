@@ -114,14 +114,16 @@ while ($line = <>){
       
       $stsEvents .= "\tstsfile << \"EVENT $eventCounter $func\" << std::endl ; \n";
       
-    if($func eq 'MPI_Send')
+    if(($func eq 'MPI_Send') || ($func eq 'MPI_Isend'))
     {
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\twrite_BEGIN_IDLE();\n";
       $funcDefinitions .= "\tlong startTime = time_us();\n";
       $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
       $funcDefinitions .= "\twrite_EVENT_PAIR_Comm($funcEvent, startTime,count,datatype);\n";
 
+      $funcDefinitions .= "\twrite_END_IDLE();\n";
       $funcDefinitions .= "\twrite_BEGIN_PROCESSING();\n";
       $funcDefinitions .= "\treturn ret;\n";
 
@@ -130,14 +132,16 @@ while ($line = <>){
       $numFuncDefinitions ++;
 
     }
-    elsif($func eq 'MPI_Recv')
+    elsif($func eq 'MPI_Recv' || $func eq 'MPI_Irecv')
     {
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\twrite_BEGIN_IDLE();\n";
       $funcDefinitions .= "\tlong startTime = time_us();\n";
       $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
       $funcDefinitions .= "\twrite_EVENT_PAIR_Comm($funcEvent, startTime,count,datatype);\n";
 
+      $funcDefinitions .= "\twrite_END_IDLE();\n";
       $funcDefinitions .= "\twrite_BEGIN_PROCESSING_AFTER_RECV(source,count,datatype);\n";
       $funcDefinitions .= "\treturn ret;\n";
 
@@ -150,10 +154,12 @@ while ($line = <>){
 
       $funcDefinitions .= "$returntype $func $typedparams {\n";
       $funcDefinitions .= "\twrite_END_PROCESSING();\n";
+      $funcDefinitions .= "\twrite_BEGIN_IDLE();\n";
       $funcDefinitions .= "\tlong startTime = time_us();\n";
       $funcDefinitions .= "\t$returntype ret = P$func$untypedparams;\n";
       $funcDefinitions .= "\twrite_EVENT_PAIR($funcEvent, startTime);\n";
       
+      $funcDefinitions .= "\twrite_END_IDLE();\n";
       $funcDefinitions .= "\twrite_BEGIN_PROCESSING();\n";
       $funcDefinitions .= "\treturn ret;\n";
       

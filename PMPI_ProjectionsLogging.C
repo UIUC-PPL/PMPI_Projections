@@ -18,6 +18,60 @@
 
 #define OUTBUFSIZE 1024*1024*4
 
+#ifdef __cplusplus
+#define EXTERN_C extern "C" 
+#else
+#define EXTERN_C 
+#endif
+
+#define  CREATION           1
+#define  BEGIN_PROCESSING   2
+#define  END_PROCESSING     3
+#define  ENQUEUE            4
+#define  DEQUEUE            5
+#define  BEGIN_COMPUTATION  6
+#define  END_COMPUTATION    7
+#define  BEGIN_INTERRUPT    8
+#define  END_INTERRUPT      9
+#define  MESSAGE_RECV       10
+#define  BEGIN_TRACE        11
+#define  END_TRACE          12
+#define  USER_EVENT         13
+#define  BEGIN_IDLE         14
+#define  END_IDLE           15
+#define  BEGIN_PACK         16
+#define  END_PACK           17
+#define  BEGIN_UNPACK       18
+#define  END_UNPACK         19
+#define  CREATION_BCAST     20
+
+#define  CREATION_MULTICAST 21
+ 
+#define  BEGIN_FUNC         22
+#define  END_FUNC           23
+
+/* Memory tracing */
+#define  MEMORY_MALLOC      24
+#define  MEMORY_FREE        25
+
+/* Trace user supplied data */
+#define USER_SUPPLIED       26
+
+/* Trace memory usage */
+#define MEMORY_USAGE_CURRENT       27
+
+/* Trace user supplied note (text string)  */
+#define USER_SUPPLIED_NOTE       28
+
+/* Trace user supplied note (text string, with start, end times, and user event id)  */
+#define USER_SUPPLIED_BRACKETED_NOTE       29
+
+/* Support for Phases and time-partial logs */
+#define END_PHASE           30
+#define SURROGATE_BLOCK     31 /* inserted by cluster analysis only */
+
+#define  USER_EVENT_PAIR    100
+
 
 long records_since_flush = 0;
 char *out_buf;
@@ -111,14 +165,14 @@ void inline flush(){
 }
 
 void write_log_header(){
-	sprintf(curr_buf_position, "6 0\n");
+	sprintf(curr_buf_position, "%d 0\n", BEGIN_COMPUTATION);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
 }
 
 void write_log_footer(){
-	sprintf(curr_buf_position, "7 %ld\n",time_us());
+	sprintf(curr_buf_position, "%d %ld\n", END_COMPUTATION, time_us());
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -138,7 +192,7 @@ void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
 	int event = 0;
 	int pe = rank;
-	sprintf(curr_buf_position, "100 %d %ld %d %d\n100 %d %ld %d %d\n", userEventID, startTime, event, pe, userEventID, endTime, event, pe);
+	sprintf(curr_buf_position, "%d %d %ld %d %d\n100 %d %ld %d %d\n",USER_EVENT_PAIR, userEventID, startTime, event, pe, userEventID, endTime, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	records_since_flush ++;
@@ -150,7 +204,7 @@ void write_EVENT(int userEventID){
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
-	sprintf(curr_buf_position, "13 %d %ld %d %d\n", userEventID, time, event, pe);
+	sprintf(curr_buf_position, "%d %d %ld %d %d\n", USER_EVENT, userEventID, time, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -186,11 +240,33 @@ void write_BEGIN_PROCESSING_AFTER_RECV(int source,int count,MPI_Datatype datatyp
 
         int pe = source;
         int msglen=count*getTypeSize(datatype);
-	printf("Coming in COMM ------- %d\n",getTypeSize(datatype));
         add_BEGIN_PROCESSING_ENTRY(msglen,pe);
 }
 
 
+void write_BEGIN_IDLE() 
+{
+	int entry = source_location_int();
+	long time = time_us();
+	recentSourceLocation = entry;
+    sprintf(curr_buf_position, "%d %ld %d\n", BEGIN_IDLE, time, rank);
+    curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+	source_locations.insert(entry);
+} 
+
+void write_END_IDLE() 
+{
+	int entry = source_location_int();
+	long time = time_us();
+	recentSourceLocation = entry;
+    sprintf(curr_buf_position, "%d %ld %d\n", END_IDLE, time, rank);
+    curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+	source_locations.insert(entry);
+}
 void write_BEGIN_PROCESSING(){
 	
 	int pe = rank;
@@ -207,9 +283,9 @@ void write_END_PROCESSING(){
 	int msglen = 0;
 	long cpuEndTime = 0;
 	int numPerfCounts = 0;
-		
-	sprintf(curr_buf_position, "3 %d %d %ld %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );
-	curr_buf_position += strlen(curr_buf_position);	// Advance pointer to what we just wrote
+	
+    sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d\n", END_PROCESSING, mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );	
+	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
 }
@@ -217,7 +293,7 @@ void write_END_PROCESSING(){
 
 
 void write_USER_SUPPLIED(int value){
-	sprintf(curr_buf_position, "26 %d\n", value);
+	sprintf(curr_buf_position, "%d %d\n", USER_SUPPLIED, value);
 	curr_buf_position += strlen(curr_buf_position);	// Advance pointer to what we just wrote
 	records_since_flush ++;
 	flush();
@@ -230,7 +306,7 @@ void write_USER_SUPPLIED(int value){
 
 
 
-int MPI_Init(int * p1, char *** p2){
+EXTERN_C int MPI_Init(int * p1, char *** p2){
 	int ret = PMPI_Init(p1,p2);
 	PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	PMPI_Comm_size( MPI_COMM_WORLD, &np );
@@ -256,7 +332,7 @@ int MPI_Init(int * p1, char *** p2){
 	return ret;
 }
 
-int MPI_Finalize(void){
+EXTERN_C int MPI_Finalize(void){
 	write_EVENT(MPI_Finalize_event);
 	write_END_PROCESSING();
 	write_log_footer();
@@ -300,38 +376,38 @@ int MPI_Finalize(void){
 
 // FORTRAN bindings
 
-void mpi_init_( MPI_Fint *ierr )
+EXTERN_C void mpi_init_( MPI_Fint *ierr )
 {
     *ierr = MPI_Init(NULL, NULL );
 
 }
 
-void mpi_finalize_(int *ierr )
+EXTERN_C void mpi_finalize_(int *ierr )
 {
     *ierr = MPI_Finalize();
 }
 
 
-void mpi_comm_create_(MPI_Fint *comm, MPI_Fint *group, MPI_Fint *newcomm, MPI_Fint *__ierr)
+EXTERN_C void mpi_comm_create_(MPI_Fint *comm, MPI_Fint *group, MPI_Fint *newcomm, MPI_Fint *__ierr)
 {
     *__ierr = MPI_Comm_create((MPI_Comm) *comm, (MPI_Group) *group, (MPI_Comm*)newcomm);
     
 }
 
 
-int mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
+EXTERN_C int mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
 {
     *__ierr = MPI_Comm_dup((MPI_Comm) *comm, (MPI_Comm*) newcomm);
 }
 
-int mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
+EXTERN_C int mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
 {
     *__ierr = MPI_Comm_split((MPI_Comm) *comm, (int) *color, (int) *key, (MPI_Comm*)newcomm);
 }
 
 
 
-void mpi_send_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_send_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                 MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                 MPI_Fint *__ierr )
 {
@@ -339,7 +415,7 @@ void mpi_send_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                        (int)*dest, (int)*tag, (MPI_Comm)*comm);
 }
 
-void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                  MPI_Fint *request, MPI_Fint *__ierr )
 {
@@ -349,7 +425,7 @@ void mpi_isend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                         (MPI_Request*)request);
 }
 
-void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype, 
+EXTERN_C void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype, 
                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm, 
                  MPI_Fint *__ierr )
 {
@@ -357,7 +433,7 @@ void mpi_bsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                          (int)*dest, (int)*tag, (MPI_Comm)*comm );
 }
 
-void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                   MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                   MPI_Fint *request, MPI_Fint *__ierr )
 {
@@ -367,7 +443,7 @@ void mpi_ibsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
 }
 
 
-void mpi_rsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_rsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                  MPI_Fint *__ierr )
 {
@@ -375,7 +451,7 @@ void mpi_rsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                         (int)*dest, (int)*tag, (MPI_Comm)*comm);
 }
 
-void mpi_irsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_irsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                   MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                   MPI_Fint *request, MPI_Fint *__ierr )
 {
@@ -385,7 +461,7 @@ void mpi_irsend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
 }
 
 
-void mpi_ssend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_ssend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                  MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                  MPI_Fint *__ierr )
 {
@@ -395,7 +471,7 @@ void mpi_ssend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
 }
 
 
-void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                   MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm,
                   MPI_Fint *request, MPI_Fint *__ierr )
 {
@@ -407,7 +483,7 @@ void mpi_issend_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
 }
 
 
-void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+EXTERN_C void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                     MPI_Fint *dest, MPI_Fint *sendtag,
                     void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
                     MPI_Fint *source, MPI_Fint *recvtag,
@@ -423,7 +499,7 @@ void mpi_sendrecv_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
 
 
 
-void mpi_sendrecv_replace_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_sendrecv_replace_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                             MPI_Fint *dest, MPI_Fint *sendtag,
                             MPI_Fint *source, MPI_Fint *recvtag,
                             MPI_Fint *comm, MPI_Fint *status,
@@ -435,13 +511,13 @@ void mpi_sendrecv_replace_( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                                    (MPI_Comm)*comm, (MPI_Status*)status );
 }
 
-void mpi_start_( MPI_Fint *request, MPI_Fint *__ierr )
+EXTERN_C void mpi_start_( MPI_Fint *request, MPI_Fint *__ierr )
 {
  
     *__ierr = MPI_Start( (MPI_Request*)request );
 }
 
-void mpi_startall_( MPI_Fint *count, MPI_Fint array_of_requests[],
+EXTERN_C void mpi_startall_( MPI_Fint *count, MPI_Fint array_of_requests[],
                     MPI_Fint *__ierr )
 {
 
@@ -449,7 +525,7 @@ void mpi_startall_( MPI_Fint *count, MPI_Fint array_of_requests[],
 }
 
 
-void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+EXTERN_C void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                       void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
                       MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -461,7 +537,7 @@ void mpi_allgather_ ( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                             (MPI_Comm)*comm);
 }
 
-void mpi_allgatherv_ ( void *sendbuf, MPI_Fint *sendcount,  MPI_Fint *sendtype,
+EXTERN_C void mpi_allgatherv_ ( void *sendbuf, MPI_Fint *sendcount,  MPI_Fint *sendtype,
                        void *recvbuf, MPI_Fint *recvcounts, MPI_Fint *displs,
                        MPI_Fint *recvtype, MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -473,7 +549,7 @@ void mpi_allgatherv_ ( void *sendbuf, MPI_Fint *sendcount,  MPI_Fint *sendtype,
                              (MPI_Comm)*comm);
 }
 
-void mpi_allreduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+EXTERN_C void mpi_allreduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                       MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
                       MPI_Fint *__ierr )
 {
@@ -483,7 +559,7 @@ void mpi_allreduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                             (MPI_Op)*op, (MPI_Comm)*comm );
 }
 
-void mpi_alltoall_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
+EXTERN_C void mpi_alltoall_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                     void *recvbuf, MPI_Fint *recvcnt, MPI_Fint *recvtype,
                     MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -493,7 +569,7 @@ void mpi_alltoall_( void *sendbuf, MPI_Fint *sendcount, MPI_Fint *sendtype,
                            (MPI_Comm)*comm );
 }
 
-void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
+EXTERN_C void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
                       MPI_Fint *sdispls, MPI_Fint *sendtype,
                       void *recvbuf, MPI_Fint *recvcnts,
                       MPI_Fint *rdispls, MPI_Fint *recvtype,
@@ -509,7 +585,7 @@ void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
 }
 
 /* 
-void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
+EXTERN_C void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
                       MPI_Fint *sdispls, MPI_Fint *sendtypes,
                       void *recvbuf, MPI_Fint *recvcnts,
                       MPI_Fint *rdispls, MPI_Fint *recvtypes,
@@ -524,12 +600,12 @@ void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
 }
 */
 
-void mpi_barrier_ ( MPI_Fint *comm, MPI_Fint *__ierr )
+EXTERN_C void mpi_barrier_ ( MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Barrier( (MPI_Comm)*comm );
 }
 
-void mpi_bcast_ ( void *buffer, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_bcast_ ( void *buffer, MPI_Fint *count, MPI_Fint *datatype,
                   MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Bcast(buffer, (int)*count,
@@ -537,7 +613,7 @@ void mpi_bcast_ ( void *buffer, MPI_Fint *count, MPI_Fint *datatype,
                         (MPI_Comm)*comm);
 }
 
-void mpi_exscan_ (void *sendbuf, void *recvbuf, MPI_Fint *count,
+EXTERN_C void mpi_exscan_ (void *sendbuf, void *recvbuf, MPI_Fint *count,
                       MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
                       MPI_Fint *__ierr )
 {
@@ -546,7 +622,7 @@ void mpi_exscan_ (void *sendbuf, void *recvbuf, MPI_Fint *count,
                          (MPI_Op)*op, (MPI_Comm)*comm );
 }
 
-void mpi_gather_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+EXTERN_C void mpi_gather_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                    void *recvbuf, MPI_Fint *recvcount, MPI_Fint *recvtype,
                    MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -556,7 +632,7 @@ void mpi_gather_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                          (int)*root, (MPI_Comm)*comm);
 }
 
-void mpi_gatherv_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+EXTERN_C void mpi_gatherv_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                     void *recvbuf, MPI_Fint *recvcnts, MPI_Fint *displs,
                     MPI_Fint *recvtype, MPI_Fint *root, MPI_Fint *comm,
                     MPI_Fint *__ierr )
@@ -568,7 +644,7 @@ void mpi_gatherv_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                           (MPI_Comm)*comm);
 }
 
-void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
+EXTERN_C void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
                            MPI_Fint *recvcnts, MPI_Fint *datatype,
                            MPI_Fint *op, MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -589,7 +665,7 @@ void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
                                  (MPI_Comm)*comm);
 }*/
 
-void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+EXTERN_C void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                    MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *root,
                    MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -608,7 +684,7 @@ void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                                (MPI_Op)*op);
 }*/
 
-void mpi_scan_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
+EXTERN_C void mpi_scan_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                  MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
                  MPI_Fint *__ierr )
 {
@@ -617,7 +693,7 @@ void mpi_scan_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                        (MPI_Op)*op, (MPI_Comm)*comm);
 }
 
-void mpi_scatter_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
+EXTERN_C void mpi_scatter_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                     void *recvbuf, MPI_Fint *recvcnt, MPI_Fint *recvtype,
                     MPI_Fint *root, MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -627,7 +703,7 @@ void mpi_scatter_ ( void *sendbuf, MPI_Fint *sendcnt, MPI_Fint *sendtype,
                           (int)*root, (MPI_Comm)*comm);
 }
 
-void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
+EXTERN_C void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
                      MPI_Fint *displs, MPI_Fint *sendtype,
                      void *recvbuf, MPI_Fint *recvcnt, 
                      MPI_Fint *recvtype, MPI_Fint *root,
