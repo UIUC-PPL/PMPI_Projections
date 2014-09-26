@@ -96,18 +96,34 @@ void init_time(){
 
 int getTypeSize(MPI_Datatype ty)
 {
-        int s;
-        if(ty==MPI_INT) s=sizeof(int);
-        else if(ty==MPI_CHAR) s = sizeof(char);
-        else if(ty==MPI_FLOAT) s = sizeof(float);
-        else if(ty==MPI_SHORT) s = sizeof(short);
-        else if(ty==MPI_LONG) s = sizeof(long);
-        else if(ty==MPI_DOUBLE) s = sizeof(double);
-        else if(ty==MPI_UNSIGNED_CHAR) s = sizeof(unsigned char);
-        else if(ty==MPI_UNSIGNED_SHORT) s = sizeof(unsigned short);
-        else if(ty==MPI_UNSIGNED) s = sizeof(unsigned int);
-        else if(ty==MPI_UNSIGNED_LONG) s = sizeof(unsigned long);
-        else s=-1;        return s;      
+    int s;
+    // C MPI_Datatypes
+    if(ty==MPI_CHAR) s = sizeof(char);
+    else if(ty==MPI_BYTE) s = sizeof(unsigned char);
+    else if(ty==MPI_SHORT) s = sizeof(short);
+    else if(ty==MPI_INT) s =sizeof(int);
+    else if(ty==MPI_LONG) s = sizeof(long);
+    else if(ty==MPI_FLOAT) s = sizeof(float);
+    else if(ty==MPI_DOUBLE) s = sizeof(double);
+    else if(ty==MPI_UNSIGNED_CHAR) s = sizeof(unsigned char);
+    else if(ty==MPI_UNSIGNED_SHORT) s = sizeof(unsigned short);
+    else if(ty==MPI_UNSIGNED) s = sizeof(unsigned int);
+    else if(ty==MPI_UNSIGNED_LONG) s = sizeof(unsigned long);
+    else if(ty==MPI_LONG_DOUBLE) s = sizeof(long double);
+    else if(ty==MPI_LONG_LONG_INT) s = sizeof(long long);
+    // Fortran MPI_Datatypes
+    else if(ty==MPI_CHARACTER) s = sizeof(char);
+    else if(ty==MPI_REAL) s = sizeof(float);
+    else if(ty==MPI_REAL4) s = sizeof(float);
+    else if(ty==MPI_REAL8) s = sizeof(double);
+    else if(ty==MPI_INTEGER) s = sizeof(int);
+    else if(ty==MPI_INTEGER2) s = sizeof(short);
+    else if(ty==MPI_INTEGER4) s = sizeof(int);
+    else if(ty==MPI_LOGICAL) s = sizeof(int);
+    else if(ty==MPI_DOUBLE_PRECISION) s = sizeof(double);
+    else s = -1;
+    
+    return s;      
 }
 
 
@@ -181,7 +197,7 @@ void write_log_footer(){
 void write_EVENT_PAIR_Comm(int userEventID, long startTime,int count,MPI_Datatype ty){
 	int s=getTypeSize(ty);
 	int pe = rank;
-        sprintf(curr_buf_position, "1 5 0 %ld 0 %d %d 0\n",startTime,pe,s*count);
+        sprintf(curr_buf_position, "%d %d 0 %ld 0 %d %d 0\n", CREATION, DEQUEUE, startTime, pe, s*count);
         curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
         records_since_flush ++;
         flush();
@@ -192,7 +208,7 @@ void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
 	int event = 0;
 	int pe = rank;
-	sprintf(curr_buf_position, "%d %d %ld %d %d\n100 %d %ld %d %d\n",USER_EVENT_PAIR, userEventID, startTime, event, pe, userEventID, endTime, event, pe);
+	sprintf(curr_buf_position, "%d %d %ld %d %d\n%d %d %ld %d %d\n", USER_EVENT_PAIR, userEventID, startTime, event, pe, USER_EVENT_PAIR, userEventID, endTime, event, pe);
 	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
 	records_since_flush ++;
 	records_since_flush ++;
@@ -226,7 +242,7 @@ void add_BEGIN_PROCESSING_ENTRY(int msglen,int pe){
         recentSourceLocation = entry;
         //      std::cout << "entry=" << entry << std::endl;
 
-        sprintf(curr_buf_position, "2 %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
+        sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", BEGIN_PROCESSING, mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
         curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
         records_since_flush ++;
         flush();
@@ -713,5 +729,78 @@ EXTERN_C void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
                            (MPI_Datatype)*sendtype, recvbuf,
                            (int)*recvcnt, (MPI_Datatype)*recvtype,
                            (int)*root, (MPI_Comm)*comm );
+}
+
+EXTERN_C int mpi_recv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm,
+                MPI_Fint *status, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Recv(buf, (int)*count, (MPI_Datatype)*datatype,
+                       (int)*source, (int)*tag, (MPI_Comm)*comm,
+                       (MPI_Status*)status);
+}
+
+EXTERN_C int mpi_irecv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+                 MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm,
+                 MPI_Fint *request, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Irecv(buf,(int)*count,(MPI_Datatype)*datatype,
+                        (int)*source,
+                        (int)*tag,(MPI_Comm)*comm,
+                        (MPI_Request*)request);
+}
+
+EXTERN_C double mpi_wtime_ (MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Wtime();
+}
+
+EXTERN_C double mpi_wtick_ (MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Wtick();
+}
+
+EXTERN_C int mpi_cart_create_ (MPI_Fint *comm_old, MPI_Fint *ndims, MPI_Fint *dims,
+                             MPI_Fint *periods, MPI_Fint *reorder, MPI_Fint *comm_cart,
+                             MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_create((MPI_Comm)*comm_old, (int)*ndims, (int*)dims,
+                              (int*)periods, (int)*reorder, (MPI_Comm*)comm_cart);
+}
+
+EXTERN_C int mpi_cart_coords_ (MPI_Fint *comm, MPI_Fint *rank, MPI_Fint *maxdims, 
+                               MPI_Fint *coords, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_coords((MPI_Comm)*comm, (int)*rank, (int)*maxdims, (int*)coords);
+}
+
+EXTERN_C int mpi_cart_shift_ (MPI_Fint *comm, MPI_Fint *direction, MPI_Fint *disp, 
+                              MPI_Fint *rank_source, MPI_Fint *rank_dest, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_shift((MPI_Comm)*comm, (int)*direction, (int)*disp, (int*)rank_source,
+                              (int*)rank_dest);
+}
+
+EXTERN_C int mpi_cart_sub_ (MPI_Fint *comm, MPI_Fint *remain_dims, MPI_Fint *newcomm,
+                            MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_sub((MPI_Comm)*comm, (int*)remain_dims, (MPI_Comm*)newcomm);
+}
+
+EXTERN_C int mpi_cart_rank_ (MPI_Fint *comm, MPI_Fint *coords, MPI_Fint *rank, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_rank((MPI_Comm)*comm, (int*)coords, (int*)rank);
+}
+
+EXTERN_C int mpi_cart_get_ (MPI_Fint *comm, MPI_Fint *maxdims, MPI_Fint *dims, MPI_Fint *periods,
+                            MPI_Fint *coords, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_get((MPI_Comm)*comm, (int)*maxdims, (int*)dims, (int*)periods, (int*)coords);
+}
+
+EXTERN_C int mpi_cart_map_ (MPI_Fint *comm, MPI_Fint *ndims, MPI_Fint *dims, MPI_Fint *periods,
+                            MPI_Fint *newrank, MPI_Fint *__ierr )
+{
+    *__ierr = MPI_Cart_map((MPI_Comm)*comm, (int)*ndims, (int*)dims, (int*)periods, (int*)newrank);
 }
 
