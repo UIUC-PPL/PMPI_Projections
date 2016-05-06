@@ -1,5 +1,5 @@
 # (c) 2009 Isaac Dooley
-CXX = g++ -g -std=c++11
+CXX = g++ -g
 
 TARGETS = libpmpiprojections.a
 LIBOBJS =  PMPI_ProjectionsLogging.o
