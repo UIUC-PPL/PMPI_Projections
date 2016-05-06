@@ -18,7 +18,11 @@ int doWork() {
 }
 
 int main(int argc, char ** argv){
-  Prj_Init(1);
+  int numPEs = 2, i;
+  if (argc > 1) {
+    numPEs = atoi(argv[1]);
+  }
+  Prj_Init(numPEs);
   printf("Initialized tracing\n");
 
   int beginNum = Prj_register_event("beginEvent");
@@ -30,20 +34,22 @@ int main(int argc, char ** argv){
   int computeEvent = Prj_register_event("computeEvent");
   printf("Registered event with index: %d\n", computeEvent);
 
-  
-  Prj_add_event(beginNum, 0);
-  printf("Wrote event with index: %d\n", beginNum);
 
-  doWork();
-  long start_time = Prj_get_time();
-  int result = doWork();
-  printf("Got result: %d (garbage)\n", result);
-  Prj_add_bracketed_event(computeEvent, start_time, 0);
-  printf("Wrote bracketed event with index: %d\n", computeEvent);
-  doWork();
+  for (i = 0; i < numPEs; ++i) {
+    Prj_add_event(beginNum, i);
+    printf("Wrote event with index: %d\n", beginNum);
 
-  Prj_add_event(endNum, 0);
-  printf("Wrote event with index: %d\n", endNum);
+    doWork();
+    long start_time = Prj_get_time();
+    int result = doWork();
+    printf("Got result: %d (garbage)\n", result);
+    Prj_add_bracketed_event(computeEvent, start_time, i);
+    printf("Wrote bracketed event with index: %d\n", computeEvent);
+    doWork();
+
+    Prj_add_event(endNum, i);
+    printf("Wrote event with index: %d\n", endNum);
+  }
 
   Prj_Finalize();
   printf("Finalized tracing\n");
