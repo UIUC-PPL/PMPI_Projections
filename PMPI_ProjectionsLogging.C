@@ -46,17 +46,15 @@ std::vector<char *> out_buf;
 std::vector<char *> curr_buf_position;
 std::vector<char *> flush_point;
 
-std::ofstream *outfile;
+std::ofstream* outfile;
 
 std::map<int,std::string> eventToName;
 int currentEvent = 0;
 
 double initTime;
-
-int rank;
 int np;
 
-double getTime() {
+double getAbsoluteTime() {
   struct timespec ts;
 #ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
   clock_serv_t cclock;
@@ -74,12 +72,8 @@ double getTime() {
 
 }
 
-void init_time() {
-  initTime = getTime();
-}
-
-long time_us(){
-  return ((getTime()-initTime)*1000000.0);
+long Prj_get_time(){
+  return ((getAbsoluteTime()-initTime)*1000000.0);
 }
 
 void writeSts(){
@@ -127,26 +121,26 @@ void inline flush(int threadIdx){
 void write_log_header(int threadIdx){
   sprintf(curr_buf_position[threadIdx], "%d 0\n", BEGIN_COMPUTATION);
   curr_buf_position[threadIdx] += strlen(curr_buf_position[threadIdx]); // Advance pointer to what we just wrote
-  records_since_flush[threadIdx] ++;
+  records_since_flush[threadIdx]++;
   flush(threadIdx);
 }
 
 void write_log_footer(int threadIdx){
-  sprintf(curr_buf_position[threadIdx], "%d %ld\n", END_COMPUTATION, time_us());
+  sprintf(curr_buf_position[threadIdx], "%d %ld\n", END_COMPUTATION, Prj_get_time());
   curr_buf_position[threadIdx] += strlen(curr_buf_position[threadIdx]); // Advance pointer to what we just wrote
   records_since_flush[threadIdx]++;
   flush(threadIdx);
 }
 
-int register_EVENT(const char* eventName) {
+int Prj_register_event(const char* eventName) {
   int event = currentEvent++;
   eventToName[event] = std::string(eventName);
   return event;
 }
 
 /// Write out the bracketed user event when it finishes
-void write_EVENT_PAIR(int userEventID, long startTime, int threadIdx){
-  long endTime = time_us();
+void Prj_add_bracketed_event(int userEventID, long startTime, int threadIdx){
+  long endTime = Prj_get_time();
   int event = 0;
   int pe = threadIdx;
   sprintf(curr_buf_position[threadIdx], "%d %d %ld %d %d\n%d %d %ld %d %d\n", USER_EVENT_PAIR, userEventID, startTime, event, pe, USER_EVENT_PAIR, userEventID, endTime, event, pe);
@@ -157,8 +151,8 @@ void write_EVENT_PAIR(int userEventID, long startTime, int threadIdx){
 }
 
 /// Write out a user event
-void write_EVENT(int userEventID, int threadIdx){
-  long time = time_us();
+void Prj_add_event(int userEventID, int threadIdx){
+  long time = Prj_get_time();
   int event = 0;
   int pe = threadIdx;
   sprintf(curr_buf_position[threadIdx], "%d %d %ld %d %d\n", USER_EVENT, userEventID, time, event, pe);
@@ -167,8 +161,8 @@ void write_EVENT(int userEventID, int threadIdx){
   flush(threadIdx);
 }
 
-void Projections_Init(int numThreads) {
-  init_time();
+void Prj_Init(int numThreads) {
+  initTime = getAbsoluteTime();
   np = numThreads;
   
   records_since_flush.resize(np, 0);
@@ -196,7 +190,7 @@ void Projections_Init(int numThreads) {
   }
 }
 
-void Projections_Finalize(void) {
+void Prj_Finalize(void) {
   for (int i = 0; i < np; ++i) {
     write_log_footer(i);
     writeToDisk(i);

@@ -2,12 +2,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void Projections_Init(int numThreads);
-void Projections_Finalize();
+void Prj_Init(int numThreads);
+void Prj_Finalize();
 
-int register_EVENT(const char* eventName);
-void write_EVENT_PAIR(int userEventID, long startTime, int threadIdx);
-void write_EVENT(int userEventID, int threadIdx);
+int Prj_register_event(const char* eventName);
+void Prj_add_bracketed_event(int userEventID, long startTime, int threadIdx);
+void Prj_add_event(int userEventID, int threadIdx);
+long Prj_get_time();
 #ifdef __cplusplus  
 } // extern "C"  
 #endif

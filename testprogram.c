@@ -18,22 +18,34 @@ int doWork() {
 }
 
 int main(int argc, char ** argv){
-  Projections_Init(1);
+  Prj_Init(1);
   printf("Initialized tracing\n");
 
-  int eventNum =  register_EVENT("testEvent");
-  printf("Registered event with index: %d\n", eventNum);
+  int beginNum = Prj_register_event("beginEvent");
+  printf("Registered event with index: %d\n", beginNum);
 
-  write_EVENT(eventNum, 0);
-  printf("Wrote event with index: %d\n", eventNum);
+  int endNum = Prj_register_event("endEvent");
+  printf("Registered event with index: %d\n", endNum);
+
+  int computeEvent = Prj_register_event("computeEvent");
+  printf("Registered event with index: %d\n", computeEvent);
+
   
+  Prj_add_event(beginNum, 0);
+  printf("Wrote event with index: %d\n", beginNum);
+
+  doWork();
+  long start_time = Prj_get_time();
   int result = doWork();
   printf("Got result: %d (garbage)\n", result);
+  Prj_add_bracketed_event(computeEvent, start_time, 0);
+  printf("Wrote bracketed event with index: %d\n", computeEvent);
+  doWork();
 
-  write_EVENT(eventNum, 0);
-  printf("Wrote event with index: %d\n", eventNum);
+  Prj_add_event(endNum, 0);
+  printf("Wrote event with index: %d\n", endNum);
 
-  Projections_Finalize();
+  Prj_Finalize();
   printf("Finalized tracing\n");
 
   return 0;
