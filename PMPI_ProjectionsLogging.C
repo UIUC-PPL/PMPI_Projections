@@ -188,6 +188,10 @@ void Prj_Init(int numThreads) {
 
     write_log_header(i);
   }
+
+  std::ofstream projrc;
+  projrc.open("Proj.projrc", std::ios::out | std::ios::trunc);
+  projrc.close();
 }
 
 void Prj_Finalize(void) {
