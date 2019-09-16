@@ -348,6 +348,33 @@ EXTERN_C int MPI_Init(int * p1, char *** p2){
 	return ret;
 }
 
+
+EXTERN_C int MPI_Init_thread(int * p1, char *** p2, int required, int *provided){
+	int ret = PMPI_Init_thread(p1,p2, required, provided);
+	PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
+	PMPI_Comm_size( MPI_COMM_WORLD, &np );
+	init_time();
+
+	out_buf = (char*)malloc(OUTBUFSIZE);
+	assert(out_buf);
+	out_buf[0]='\0';
+	curr_buf_position = out_buf;
+	flush_point = out_buf + OUTBUFSIZE - 400; // This should allow one more record before overflowing the buffer
+
+	// open file
+	char filename[1024];
+	sprintf(filename, "ProjPMPI.%d.log", rank);
+
+	outfile.open(filename);
+
+	write_log_header();
+
+	write_BEGIN_PROCESSING();
+	write_EVENT(MPI_Init_event);
+
+	return ret;
+}
+
 EXTERN_C int MPI_Finalize(void){
 	write_EVENT(MPI_Finalize_event);
 	write_END_PROCESSING();
@@ -395,7 +422,11 @@ EXTERN_C int MPI_Finalize(void){
 EXTERN_C void mpi_init_( MPI_Fint *ierr )
 {
     *ierr = MPI_Init(NULL, NULL );
+}
 
+EXTERN_C void mpi_init_thread_( MPI_Fint *required, MPI_Fint *provided, MPI_Fint *ierr )
+{
+    *ierr = MPI_Init_thread(NULL, NULL, *required, provided );
 }
 
 EXTERN_C void mpi_finalize_(int *ierr )
