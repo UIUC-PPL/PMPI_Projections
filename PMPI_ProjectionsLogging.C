@@ -640,9 +640,9 @@ EXTERN_C void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
 {
  
     *__ierr = MPI_Alltoallw(sendbuf, (int*)sendcnts,
-                            (int*)sdispls, (MPI_Datatype *)(*sendtypes),
+                            (int*)sdispls, (MPI_Datatype *)sendtypes,
                             recvbuf, (int*)recvcnts,
-                            (int*)rdispls, (MPI_Datatype *)(*recvtypes),
+                            (int*)rdispls, (MPI_Datatype *)recvtypes,
                             (MPI_Comm)*comm );
 }
 */
