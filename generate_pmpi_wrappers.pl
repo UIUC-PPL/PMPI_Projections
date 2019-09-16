@@ -81,6 +81,7 @@ while ($line = <>){
       $untypedparams =~ s/MPI_Aint \*/ /g;
 
       
+      $untypedparams =~ s/const / /g;
       $untypedparams =~ s/int \*/ /g;
       $untypedparams =~ s/void \*/ /g;
       $untypedparams =~ s/char \*\*\*/ /g;
