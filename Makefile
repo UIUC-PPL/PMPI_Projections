@@ -11,11 +11,11 @@ MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
 
 # USE_STACK = -D__USE_STACK_TRACE_TO_IDENTIFY_TASKS__
 
-MPICC = mpicc -g
-MPICXX = mpicxx -g
+MPICC = mpicc -g -fPIC
+MPICXX = mpicxx -g -fPIC
 
-CC = gcc -g
-CXX = g++ -g
+CC = gcc -g -fPIC
+CXX = g++ -g -fPIC
 
 TARGETS = testprogram 
 LIBOBJS =  PMPI_ProjectionsLogging.o generated-definitions.o generated-stsEvents.o source_location.o
@@ -24,6 +24,9 @@ all : $(TARGETS)
 
 libpmpiprojections.a : $(LIBOBJS)
 	ar rvs libpmpiprojections.a $(LIBOBJS)
+
+libpmpiprojections.so : $(LIBOBJS)
+	$(MPICXX) -shared -o $@ $^
 
 source_location.o : source_location.c source_location.h
 	$(CC) -c source_location.c
@@ -41,7 +44,7 @@ testprogram.o : testprogram.c Makefile
 	$(MPICXX) -c testprogram.c -O0 -g
 
 testprogram :  Makefile libpmpiprojections.a testprogram.o
-	$(MPICXX) testprogram.o  -L. -lpmpiprojections $(MPICH_LIB) -o testprogram 
+	$(MPICXX) testprogram.o  -L. -lpmpiprojections -Wl,-rpath=. $(MPICH_LIB) -o testprogram
 
 testprogram-no-PMPI : testprogram.o Makefile source_location.o
 	$(MPICXX) testprogram.o  $(MPICH_LIB) -o testprogram-no-PMPI 
