@@ -30,6 +30,8 @@ $stsEventsFooter = " } \n";
 
 while ($line = <>){
   chomp $line;
+  if($line =~ /(\S*)\#/) { next; }
+
   if($line =~ /(\S*) MPI_([^(]*)([^;]*)/){
     $returntype = $1;
     $func = "MPI_$2";
