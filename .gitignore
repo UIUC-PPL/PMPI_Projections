@@ -1,0 +1,14 @@
+*~
+
+*.o
+
+generated-definitions.*
+generated-eventids.h
+generated-stsEvents.C
+
+*.log
+*.sts
+
+libpmpiprojections.a
+libpmpiprojections.so
+testprogram
