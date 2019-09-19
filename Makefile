@@ -17,7 +17,9 @@ MPICXX = mpicxx -g -fPIC
 CC = gcc -g -fPIC
 CXX = g++ -g -fPIC
 
-TARGETS = testprogram 
+LIBNAME = libpmpiprojections
+
+TARGETS = testprogram $(LIBNAME).a $(LIBNAME).so
 LIBOBJS =  PMPI_ProjectionsLogging.o generated-definitions.o generated-stsEvents.o source_location.o
 
 all : $(TARGETS)
