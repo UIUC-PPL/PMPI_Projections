@@ -1,4 +1,4 @@
-# A list of functions to intercept via PMPI. This list is meant to be used with MPI version 1.
+# A list of functions to intercept via PMPI. This list is meant to be used with MPI version 3. Many functions are presently missing or commented out, in need of update.
 
 int MPI_Abort(MPI_Comm comm, int errorcode);
 int MPI_Address(void *location, MPI_Aint *address);
