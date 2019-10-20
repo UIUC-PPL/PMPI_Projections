@@ -781,14 +781,14 @@ EXTERN_C int mpi_irecv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                         (MPI_Request*)request);
 }
 
-EXTERN_C double mpi_wtime_ (MPI_Fint *__ierr )
+EXTERN_C double mpi_wtime_ ()
 {
-    *__ierr = MPI_Wtime();
+    return MPI_Wtime();
 }
 
-EXTERN_C double mpi_wtick_ (MPI_Fint *__ierr )
+EXTERN_C double mpi_wtick_ ()
 {
-    *__ierr = MPI_Wtick();
+    return MPI_Wtick();
 }
 
 EXTERN_C int mpi_cart_create_ (MPI_Fint *comm_old, MPI_Fint *ndims, MPI_Fint *dims,
