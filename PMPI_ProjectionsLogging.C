@@ -442,12 +442,12 @@ EXTERN_C void mpi_comm_create_(MPI_Fint *comm, MPI_Fint *group, MPI_Fint *newcom
 }
 
 
-EXTERN_C int mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
+EXTERN_C void mpi_comm_dup_(MPI_Fint *comm, MPI_Fint *newcomm, MPI_Fint *__ierr)
 {
     *__ierr = MPI_Comm_dup((MPI_Comm) *comm, (MPI_Comm*) newcomm);
 }
 
-EXTERN_C int mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
+EXTERN_C void mpi_comm_split_(MPI_Fint *comm, MPI_Fint* color, MPI_Fint* key, MPI_Fint* newcomm, MPI_Fint *__ierr)
 {
     *__ierr = MPI_Comm_split((MPI_Comm) *comm, (int) *color, (int) *key, (MPI_Comm*)newcomm);
 }
@@ -762,7 +762,7 @@ EXTERN_C void mpi_scatterv_ ( void *sendbuf, MPI_Fint *sendcnts,
                            (int)*root, (MPI_Comm)*comm );
 }
 
-EXTERN_C int mpi_recv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_recv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                 MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm,
                 MPI_Fint *status, MPI_Fint *__ierr )
 {
@@ -771,7 +771,7 @@ EXTERN_C int mpi_recv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                        (MPI_Status*)status);
 }
 
-EXTERN_C int mpi_irecv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
+EXTERN_C void mpi_irecv_ ( void *buf, MPI_Fint *count, MPI_Fint *datatype,
                  MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm,
                  MPI_Fint *request, MPI_Fint *__ierr )
 {
@@ -791,7 +791,7 @@ EXTERN_C double mpi_wtick_ ()
     return MPI_Wtick();
 }
 
-EXTERN_C int mpi_cart_create_ (MPI_Fint *comm_old, MPI_Fint *ndims, MPI_Fint *dims,
+EXTERN_C void mpi_cart_create_ (MPI_Fint *comm_old, MPI_Fint *ndims, MPI_Fint *dims,
                              MPI_Fint *periods, MPI_Fint *reorder, MPI_Fint *comm_cart,
                              MPI_Fint *__ierr )
 {
@@ -799,37 +799,37 @@ EXTERN_C int mpi_cart_create_ (MPI_Fint *comm_old, MPI_Fint *ndims, MPI_Fint *di
                               (int*)periods, (int)*reorder, (MPI_Comm*)comm_cart);
 }
 
-EXTERN_C int mpi_cart_coords_ (MPI_Fint *comm, MPI_Fint *rank, MPI_Fint *maxdims, 
+EXTERN_C void mpi_cart_coords_ (MPI_Fint *comm, MPI_Fint *rank, MPI_Fint *maxdims,
                                MPI_Fint *coords, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_coords((MPI_Comm)*comm, (int)*rank, (int)*maxdims, (int*)coords);
 }
 
-EXTERN_C int mpi_cart_shift_ (MPI_Fint *comm, MPI_Fint *direction, MPI_Fint *disp, 
+EXTERN_C void mpi_cart_shift_ (MPI_Fint *comm, MPI_Fint *direction, MPI_Fint *disp,
                               MPI_Fint *rank_source, MPI_Fint *rank_dest, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_shift((MPI_Comm)*comm, (int)*direction, (int)*disp, (int*)rank_source,
                               (int*)rank_dest);
 }
 
-EXTERN_C int mpi_cart_sub_ (MPI_Fint *comm, MPI_Fint *remain_dims, MPI_Fint *newcomm,
+EXTERN_C void mpi_cart_sub_ (MPI_Fint *comm, MPI_Fint *remain_dims, MPI_Fint *newcomm,
                             MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_sub((MPI_Comm)*comm, (int*)remain_dims, (MPI_Comm*)newcomm);
 }
 
-EXTERN_C int mpi_cart_rank_ (MPI_Fint *comm, MPI_Fint *coords, MPI_Fint *rank, MPI_Fint *__ierr )
+EXTERN_C void mpi_cart_rank_ (MPI_Fint *comm, MPI_Fint *coords, MPI_Fint *rank, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_rank((MPI_Comm)*comm, (int*)coords, (int*)rank);
 }
 
-EXTERN_C int mpi_cart_get_ (MPI_Fint *comm, MPI_Fint *maxdims, MPI_Fint *dims, MPI_Fint *periods,
+EXTERN_C void mpi_cart_get_ (MPI_Fint *comm, MPI_Fint *maxdims, MPI_Fint *dims, MPI_Fint *periods,
                             MPI_Fint *coords, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_get((MPI_Comm)*comm, (int)*maxdims, (int*)dims, (int*)periods, (int*)coords);
 }
 
-EXTERN_C int mpi_cart_map_ (MPI_Fint *comm, MPI_Fint *ndims, MPI_Fint *dims, MPI_Fint *periods,
+EXTERN_C void mpi_cart_map_ (MPI_Fint *comm, MPI_Fint *ndims, MPI_Fint *dims, MPI_Fint *periods,
                             MPI_Fint *newrank, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Cart_map((MPI_Comm)*comm, (int)*ndims, (int*)dims, (int*)periods, (int*)newrank);
