@@ -2,8 +2,9 @@
 
 # ------------------------------------------------
 # Enable one of the following files. 
-# For MPI 1 routines: 
-MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
+# For MPI 1 routines:
+MPI_PROTOTYPES_FILE =  nompi.h
+#MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
 # For MPI 2 routines: 
 #MPI_PROTOTYPES_FILE = mpi.h-v2-sanitized
 # ------------------------------------------------
@@ -17,12 +18,16 @@ MPICXX = mpicxx -g -fPIC
 CC = gcc -g -fPIC
 CXX = g++ -g -fPIC
 
-LIBNAME = libpmpiprojections
+LIBNAME = libpabtprojections
 
 TARGETS = testprogram $(LIBNAME).a $(LIBNAME).so
-LIBOBJS =  PMPI_ProjectionsLogging.o generated-definitions.o generated-stsEvents.o source_location.o
+LIBOBJS =  PMPI_ProjectionsLogging.o source_location.o
 
 all : $(TARGETS)
+
+libpabtprojections.a : $(LIBOBJS)
+	ar rvs libpabtprojections.a $(LIBOBJS)
+
 
 libpmpiprojections.a : $(LIBOBJS)
 	ar rvs libpmpiprojections.a $(LIBOBJS)

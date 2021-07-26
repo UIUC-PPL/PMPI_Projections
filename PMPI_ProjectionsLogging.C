@@ -122,7 +122,7 @@ int getTypeSize(MPI_Datatype ty)
     else if(ty==MPI_LOGICAL) s = sizeof(int);
     else if(ty==MPI_DOUBLE_PRECISION) s = sizeof(double);
     else s = -1;
-    
+
     return s;      
 }
 
@@ -138,14 +138,14 @@ void writeSts(){
 	
 	stsfile << "PROJECTIONS_ID\n";
 	stsfile << "VERSION 6.6\n";
-	stsfile << "MACHINE PMPI_Logging\n";
+	stsfile << "MACHINE PABT_Logging\n";
 	stsfile << "PROCESSORS " << np <<"\n";
 	stsfile << "TOTAL_CHARES 1\n";
 	stsfile << "TOTAL_EPS " << source_locations.size() << "\n";
 	stsfile << "TOTAL_MSGS 2\n";
 	stsfile << "TOTAL_PSEUDOS 0\n";
 	stsfile << "TOTAL_EVENTS " << NUM_EVENTS << "\n";
-	stsfile << "CHARE 0 MPI_Main\n";
+	stsfile << "CHARE 0 Main\n";
 
 	std::set<int>::iterator iter;
 
@@ -321,7 +321,7 @@ void write_USER_SUPPLIED(int value){
 
 
 
-
+/*
 EXTERN_C int MPI_Init(int * p1, char *** p2){
 	int ret = PMPI_Init(p1,p2);
 	PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -631,7 +631,7 @@ EXTERN_C void mpi_alltoallv_ ( void *sendbuf, MPI_Fint *sendcnts,
 
 }
 
-/* 
+
 EXTERN_C void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
                       MPI_Fint *sdispls, MPI_Fint *sendtypes,
                       void *recvbuf, MPI_Fint *recvcnts,
@@ -645,7 +645,7 @@ EXTERN_C void mpi_alltoallw_ ( void *sendbuf, MPI_Fint *sendcnts,
                             (int*)rdispls, (MPI_Datatype *)recvtypes,
                             (MPI_Comm)*comm );
 }
-*/
+
 
 EXTERN_C void mpi_barrier_ ( MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -701,7 +701,7 @@ EXTERN_C void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
                                  (MPI_Comm)*comm);
 }
 
-/*void mpi_reduce_scatter_block_ ( void *sendbuf, void *recvbuf,
+void mpi_reduce_scatter_block_ ( void *sendbuf, void *recvbuf,
                                  MPI_Fint *recvcount, MPI_Fint *datatype,
                                  MPI_Fint *op, MPI_Fint *comm, MPI_Fint *__ierr )
 {
@@ -710,7 +710,7 @@ EXTERN_C void mpi_reduce_scatter_ ( void *sendbuf, void *recvbuf,
                                  MPI_Type_f2c(*datatype), 
 				 (MPI_Op)*op,
                                  (MPI_Comm)*comm);
-}*/
+}
 
 EXTERN_C void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                    MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *root,
@@ -722,14 +722,14 @@ EXTERN_C void mpi_reduce_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                          (MPI_Comm)*comm);
 }
 
-/*void mpi_reduce_local_ ( void *inbuf, void *inoutbuf, MPI_Fint *count,
+void mpi_reduce_local_ ( void *inbuf, void *inoutbuf, MPI_Fint *count,
                    MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *root,
                    MPI_Fint *comm, MPI_Fint *__ierr )
 {
     *__ierr = MPI_Reduce_local(inbuf, inoutbuf,
                                (int)*count, (MPI_Datatype)*datatype,
                                (MPI_Op)*op);
-}*/
+}
 
 EXTERN_C void mpi_scan_ ( void *sendbuf, void *recvbuf, MPI_Fint *count,
                  MPI_Fint *datatype, MPI_Fint *op, MPI_Fint *comm,
@@ -834,4 +834,4 @@ EXTERN_C void mpi_cart_map_ (MPI_Fint *comm, MPI_Fint *ndims, MPI_Fint *dims, MP
 {
     *__ierr = MPI_Cart_map((MPI_Comm)*comm, (int)*ndims, (int*)dims, (int*)periods, (int*)newrank);
 }
-
+*/
