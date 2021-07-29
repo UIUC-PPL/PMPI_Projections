@@ -3,7 +3,7 @@
 # ------------------------------------------------
 # Enable one of the following files. 
 # For MPI 1 routines:
-MPI_PROTOTYPES_FILE =  nompi.h
+MPI_PROTOTYPES_FILE =  abt.h-v0
 #MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
 # For MPI 2 routines: 
 #MPI_PROTOTYPES_FILE = mpi.h-v2-sanitized
@@ -33,6 +33,9 @@ libpmpiprojections.a : $(LIBOBJS)
 	ar rvs libpmpiprojections.a $(LIBOBJS)
 
 libpmpiprojections.so : $(LIBOBJS)
+	$(MPICXX) -shared -o $@ $^
+
+libpabtprojections.so : $(LIBOBJS)
 	$(MPICXX) -shared -o $@ $^
 
 source_location.o : source_location.c source_location.h

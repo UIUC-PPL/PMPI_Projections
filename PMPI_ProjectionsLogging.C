@@ -1,14 +1,11 @@
 // (c) 2009 Isaac Dooley
 
-#include <mpi.h>
+
 #include <stdio.h>
 #include <assert.h>
 #include <map>
 #include <set>
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string.h>
 #include <execinfo.h>
 #include <stdlib.h>
@@ -78,7 +75,7 @@ char *out_buf;
 char *curr_buf_position;
 char *flush_point;
 
-std::ofstream outfile;
+
 
 std::map<int,std::string> entryToName;
 std::set<int> source_locations;
@@ -89,88 +86,52 @@ double initTime;
 
 int rank;
 int np;
+extern "C" double ABT_get_wtime(void);
 
 void init_time(){
-	initTime = PMPI_Wtime() - 0.001;
-}
-
-int getTypeSize(MPI_Datatype ty)
-{
-    int s;
-    // C MPI_Datatypes
-    if(ty==MPI_CHAR) s = sizeof(char);
-    else if(ty==MPI_BYTE) s = sizeof(unsigned char);
-    else if(ty==MPI_SHORT) s = sizeof(short);
-    else if(ty==MPI_INT) s =sizeof(int);
-    else if(ty==MPI_LONG) s = sizeof(long);
-    else if(ty==MPI_FLOAT) s = sizeof(float);
-    else if(ty==MPI_DOUBLE) s = sizeof(double);
-    else if(ty==MPI_UNSIGNED_CHAR) s = sizeof(unsigned char);
-    else if(ty==MPI_UNSIGNED_SHORT) s = sizeof(unsigned short);
-    else if(ty==MPI_UNSIGNED) s = sizeof(unsigned int);
-    else if(ty==MPI_UNSIGNED_LONG) s = sizeof(unsigned long);
-    else if(ty==MPI_LONG_DOUBLE) s = sizeof(long double);
-    else if(ty==MPI_LONG_LONG_INT) s = sizeof(long long);
-    // Fortran MPI_Datatypes
-    else if(ty==MPI_CHARACTER) s = sizeof(char);
-    else if(ty==MPI_REAL) s = sizeof(float);
-    else if(ty==MPI_REAL4) s = sizeof(float);
-    else if(ty==MPI_REAL8) s = sizeof(double);
-    else if(ty==MPI_INTEGER) s = sizeof(int);
-    else if(ty==MPI_INTEGER2) s = sizeof(short);
-    else if(ty==MPI_INTEGER4) s = sizeof(int);
-    else if(ty==MPI_LOGICAL) s = sizeof(int);
-    else if(ty==MPI_DOUBLE_PRECISION) s = sizeof(double);
-    else s = -1;
-
-    return s;      
+  initTime = ABT_get_wtime() - 0.001;
 }
 
 
-
-long time_us(){
-	return ((PMPI_Wtime()-initTime)*1000000.0);
+long time_us(double currtime){
+	return ((ABT_get_wtime()-initTime)*1000000.0);
 }
 
 
 void writeSts(){
-	std::ofstream stsfile("ProjPMPI.sts");
-	
-	stsfile << "PROJECTIONS_ID\n";
-	stsfile << "VERSION 6.6\n";
-	stsfile << "MACHINE PABT_Logging\n";
-	stsfile << "PROCESSORS " << np <<"\n";
-	stsfile << "TOTAL_CHARES 1\n";
-	stsfile << "TOTAL_EPS " << source_locations.size() << "\n";
-	stsfile << "TOTAL_MSGS 2\n";
-	stsfile << "TOTAL_PSEUDOS 0\n";
-	stsfile << "TOTAL_EVENTS " << NUM_EVENTS << "\n";
-	stsfile << "CHARE 0 Main\n";
+  FILE *stsfile=fopen("ProjPABT.sts",w);
+  fprintf(stsfile,"PROJECTIONS_ID\n");
+  fprintf(stsfile,"VERSION 6.6\n");
+  fprintf(stsfile,"MACHINE PABT_Logging\n");
+  fprintf(stsfile,"PROCESSORS %d\n", np);
+  fprintf(stsfile,"TOTAL_CHARES 1\n");
+  fprintf(stsfile,"TOTAL_EPS %d\n", source_locations.size());
+  fprintf(stsfile,"TOTAL_MSGS 2\n");
+  fprintf(stsfile,"TOTAL_PSEUDOS 0\n");
+  fprintf(stsfile,"TOTAL_EVENTS %d\n", NUM_EVENTS);
+  fprintf(stsfile,"CHARE 0 Main\n");
 
-	std::set<int>::iterator iter;
+  std::set<int>::iterator iter;
 
-	for(iter = source_locations.begin(); iter!= source_locations.end(); iter++){
-		stsfile << "ENTRY CHARE " << *iter << " (code region " << *iter<< ") 0 -1\n";
-	}
-	stsfile << "MESSAGE 0 0\n";
-	stsfile << "MESSAGE 1 0\n";
-	
-	// Call the function from generated-stsEvents.C that fills in all the "EVENT" records
-	generateStsEvents(stsfile);
-
-	stsfile << "TOTAL_FUNCTIONS 0 \n";
-	stsfile << "END\n";
-	
-	stsfile.close();
+  for(iter = source_locations.begin(); iter!= source_locations.end(); iter++){
+    fprintf(stsfile,"ENTRY CHARE %d tid %d 0 -1\n",*iter,*iter);
+  }
+  fprintf(stsfile, "MESSAGE 0 0\n");
+  fprintf(stsfile,"MESSAGE 1 0\n");
+  // Call the function from generated-stsEvents.C that fills in all the "EVENT" records
+  generateStsEvents(stsfile);
+  fprintf(stsfile, "TOTAL_FUNCTIONS 0 \n");
+  fprintf(stsfile,"END\n");
+  fclose(stsfile);
 }
 
 void inline writeToDisk(){
-  outfile << "PROJECTIONS-RECORD " << records_since_flush << "\n"; // should only appear once in file???
-	outfile << out_buf;
-	outfile.flush();
-	curr_buf_position = out_buf;
-	out_buf[0] = '\0';
-	records_since_flush = 0;
+  fprintf(outfile, "PROJECTIONS-RECORD %d\n"); // should only appear once in file???
+  fprintf(outfile,"%s",out_buf);
+  fflush(outfile);
+  curr_buf_position = out_buf;
+  out_buf[0] = '\0';
+  records_since_flush = 0;
 }
 
 /// Flush buffer if full
@@ -194,7 +155,7 @@ void write_log_footer(){
 	flush();
 }
 
-void write_EVENT_PAIR_Comm(int userEventID, long startTime,int count,MPI_Datatype ty){
+/*void write_EVENT_PAIR_Comm(int userEventID, long startTime,int count,MPI_Datatype ty){
 	int s=getTypeSize(ty);
 	int pe = rank;
         sprintf(curr_buf_position, "%d %d 0 %ld 0 %d %d 0\n", CREATION, DEQUEUE, startTime, pe, s*count);
@@ -203,6 +164,7 @@ void write_EVENT_PAIR_Comm(int userEventID, long startTime,int count,MPI_Datatyp
         flush();
 	write_EVENT_PAIR(userEventID,startTime);
 }
+*/
 /// Write out the bracketed user event when it finishes
 void write_EVENT_PAIR(int userEventID, long startTime){
 	long endTime = time_us();
@@ -252,6 +214,33 @@ void add_BEGIN_PROCESSING_ENTRY(int msglen,int pe){
 
 }
 
+void add_BEGIN_PROCESSING_ABT(int msglen,int pe, int tid){
+        int mtype = 0;
+        int entry = tid;
+        long time = time_us();
+        int event = 0;
+        long recvTime = 0;
+        int id0 = 0;
+        int id1 = 0;
+        int id2 = 0;
+        int id3 = 0;
+        long cpuStartTime = 0;
+        int numPerfCounts = 0;
+
+        recentSourceLocation = entry;
+        //      std::cout << "entry=" << entry << std::endl;
+
+        sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", BEGIN_PROCESSING, mtype, entry, time, event, pe, msglen, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
+        curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+        records_since_flush ++;
+        flush();
+
+        source_locations.insert(recentSourceLocation);
+//      printf("%d    TotalSoFar=%d\n", entry, source_locations.size());
+
+}
+
+/*
 void write_BEGIN_PROCESSING_AFTER_RECV(int source,int count,MPI_Datatype datatype){
 
         int pe = source;
@@ -259,7 +248,7 @@ void write_BEGIN_PROCESSING_AFTER_RECV(int source,int count,MPI_Datatype datatyp
         add_BEGIN_PROCESSING_ENTRY(msglen,pe);
 }
 
-
+*/
 void write_BEGIN_IDLE() 
 {
 	int entry = source_location_int();
@@ -296,6 +285,22 @@ void write_END_PROCESSING(){
 	long time = time_us();
 	int event = 0;
 	int pe = rank;
+	int msglen = 0;
+	long cpuEndTime = 0;
+	int numPerfCounts = 0;
+	
+    sprintf(curr_buf_position, "%d %d %d %ld %d %d %d %ld %d\n", END_PROCESSING, mtype, entry, time, event, pe, msglen, cpuEndTime, numPerfCounts );	
+	curr_buf_position += strlen(curr_buf_position); // Advance pointer to what we just wrote
+	records_since_flush ++;
+	flush();
+}
+
+void write_END_PROCESSING_ABT(int tid, int thisrank){
+	int mtype = 0;
+	int entry = recentSourceLocation; // Must match for NoiseMiner to match with previous BEGIN_PROCESSING
+	long time = time_us();
+	int event = 0;
+	int pe = thisrank;
 	int msglen = 0;
 	long cpuEndTime = 0;
 	int numPerfCounts = 0;
