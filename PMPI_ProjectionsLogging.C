@@ -68,14 +68,15 @@
 #define SURROGATE_BLOCK     31 /* inserted by cluster analysis only */
 
 #define  USER_EVENT_PAIR    100
-
+#define ABT_Init_event 1
+#define ABT_Finalize_event 1000000
 
 long records_since_flush = 0;
 char *out_buf;
 char *curr_buf_position;
 char *flush_point;
 
-
+FILE *outfile;
 
 std::map<int,std::string> entryToName;
 std::set<int> source_locations;
@@ -99,13 +100,13 @@ long time_us(double currtime){
 
 
 void writeSts(){
-  FILE *stsfile=fopen("ProjPABT.sts",w);
+  FILE *stsfile=fopen("ProjPABT.sts","w");
   fprintf(stsfile,"PROJECTIONS_ID\n");
   fprintf(stsfile,"VERSION 6.6\n");
   fprintf(stsfile,"MACHINE PABT_Logging\n");
   fprintf(stsfile,"PROCESSORS %d\n", np);
   fprintf(stsfile,"TOTAL_CHARES 1\n");
-  fprintf(stsfile,"TOTAL_EPS %d\n", source_locations.size());
+  fprintf(stsfile,"TOTAL_EPS %ld\n", source_locations.size());
   fprintf(stsfile,"TOTAL_MSGS 2\n");
   fprintf(stsfile,"TOTAL_PSEUDOS 0\n");
   fprintf(stsfile,"TOTAL_EVENTS %d\n", NUM_EVENTS);
@@ -126,7 +127,7 @@ void writeSts(){
 }
 
 void inline writeToDisk(){
-  fprintf(outfile, "PROJECTIONS-RECORD %d\n"); // should only appear once in file???
+  fprintf(outfile, "PROJECTIONS-RECORD %ld\n", records_since_flush); // should only appear once in file???
   fprintf(outfile,"%s",out_buf);
   fflush(outfile);
   curr_buf_position = out_buf;
@@ -321,9 +322,40 @@ void write_USER_SUPPLIED(int value){
 }
 
 
+void init_ABT_TRACE(int rank, int np)
+{
+	init_time();
+	out_buf = (char*)malloc(OUTBUFSIZE);
+	assert(out_buf);
+	out_buf[0]='\0';
+	curr_buf_position = out_buf;
+	flush_point = out_buf + OUTBUFSIZE - 400; // This should allow one more record before overflowing the buffer
+		
+	// open file
+	char filename[1024];
+	sprintf(filename, "ProjPABT.%d.log", rank);
+	
+	outfile=fopen(filename,"w");
+	
+	write_log_header();
+	
+	write_BEGIN_PROCESSING();
+	write_EVENT(ABT_Init_event);
+	
+}
 
 
-
+EXTERN_C int ABT_Finalize_trace(void){
+	write_EVENT(ABT_Finalize_event);
+	write_END_PROCESSING();
+	write_log_footer();
+	writeToDisk();
+	fclose(outfile);
+	if(rank==0){
+		writeSts();
+	}
+	return 1; /*TODO find a meaningful return value*/
+}
 
 
 /*

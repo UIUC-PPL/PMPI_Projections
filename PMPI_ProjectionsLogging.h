@@ -21,4 +21,4 @@ long time_us();
 
 
 // This one is automatically generated and is in generated-stsEvents.C:
-void generateStsEvents(std::ofstream &stsfile);
+void generateStsEvents(FILE *stsfile);

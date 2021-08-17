@@ -15,13 +15,14 @@ MPI_PROTOTYPES_FILE =  abt.h-v0
 MPICC = mpicc -g -fPIC
 MPICXX = mpicxx -g -fPIC
 
-CC = gcc -g -fPIC
+CC = gcc -g -fPIC -std=c11
 CXX = g++ -g -fPIC
 
 LIBNAME = libpabtprojections
 
 TARGETS = testprogram $(LIBNAME).a $(LIBNAME).so
-LIBOBJS =  PMPI_ProjectionsLogging.o source_location.o
+#LIBOBJS =  PMPI_ProjectionsLogging.o source_location.o
+LIBOBJS =  ProjectionsLogging.o source_location.o
 
 all : $(TARGETS)
 
@@ -36,10 +37,13 @@ libpmpiprojections.so : $(LIBOBJS)
 	$(MPICXX) -shared -o $@ $^
 
 libpabtprojections.so : $(LIBOBJS)
-	$(MPICXX) -shared -o $@ $^
+	$(CC) -shared -o $@ $^
 
 source_location.o : source_location.c source_location.h
 	$(CC) -c source_location.c
+
+ProjectionsLogging.o :  ProjectionsLogging.c Makefile source_location.o generated-eventids.h ProjectionsLogging.h 
+	$(CC) -c ProjectionsLogging.c -o ProjectionsLogging.o
 
 PMPI_ProjectionsLogging.o : PMPI_ProjectionsLogging.C Makefile source_location.o generated-eventids.h PMPI_ProjectionsLogging.h 
 	$(MPICXX) -c PMPI_ProjectionsLogging.C -o PMPI_ProjectionsLogging.o $(MPICH_INC) 
