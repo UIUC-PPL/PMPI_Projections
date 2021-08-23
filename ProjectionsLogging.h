@@ -13,6 +13,7 @@ typedef struct LogHandle
   long records_since_flush;
   int recentSourceLocation;
 } LogHandle;
+
 void ABT_init_tracing(int num_ranks);
 void write_log_header(int rank);
 void write_log_footer(int rank);

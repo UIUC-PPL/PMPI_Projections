@@ -88,10 +88,15 @@ void init_time(){
 }
 
 void ABT_init_tracing(int num_ranks){
-  printf("tracing initialized for %d ranks\n",num_ranks);
+  /*  printf("tracing initialized for %d ranks\n",num_ranks);*/
   np=num_ranks;
-  trace_handle_arr= (LogHandle*) malloc(sizeof(LogHandle)*num_ranks);
+  trace_handle_arr=  malloc(sizeof(*trace_handle_arr)*num_ranks);
   init_time();
+  int i=0;
+  for(i=0;i<num_ranks;++i)
+    {
+      ABT_init_trace(i);
+    }
 }
 
 
@@ -107,19 +112,19 @@ void writeSts(){
   fprintf(stsfile,"VERSION 11.0\n");
   fprintf(stsfile,"MACHINE \"PABT_Logging\"\n");
   fprintf(stsfile,"PROCESSORS %d\n", np);
-  fprintf(stsfile,"TOTAL_CHARES %d\n", source_locations_count);
-  fprintf(stsfile,"TOTAL_EPS %d\n",source_locations_count);
+  fprintf(stsfile,"TOTAL_CHARES %d\n", source_locations_count+1);
+  fprintf(stsfile,"TOTAL_EPS %d\n",source_locations_count+1);
   fprintf(stsfile,"TOTAL_MSGS 2\n");
   fprintf(stsfile,"TOTAL_PSEUDOS 0\n");
   fprintf(stsfile,"TOTAL_EVENTS %d\n", NUM_EVENTS);
 
   /*TODO non set implementation of source_locations ?*/
 
-  for(int iter = 0; iter< source_locations_count; iter++){
+  for(int iter = 0; iter<= source_locations_count; iter++){
     fprintf(stsfile,"CHARE %d \"tid_%d\" -1\n",iter,iter);
     }
 
-  for(int iter = 0; iter< source_locations_count; iter++){
+  for(int iter = 0; iter<= source_locations_count; iter++){
       fprintf(stsfile,"ENTRY CHARE %d \"tid_%d\" %d %d\n",iter,iter,iter,0);
     }
   fprintf(stsfile, "MESSAGE 0 0\n");
@@ -182,7 +187,7 @@ void write_EVENT(int rank, int userEventID){
 }
 EXTERN_C void ABT_init_trace(int rank)
 {
-  printf("ABT_init_trace r %d:%d \n", rank, np);
+  /*  printf("ABT_init_trace r %d:%d \n", rank, np);*/
   trace_handle_arr[rank].rank=rank;
   trace_handle_arr[rank].out_buf = (char*)malloc(OUTBUFSIZE);
 	assert(trace_handle_arr[rank].out_buf);
@@ -199,14 +204,14 @@ EXTERN_C void ABT_init_trace(int rank)
 	write_log_header(rank);
 	
 	write_BEGIN_PROCESSING(rank);
-	write_EVENT(rank,ABT_Init_event);
+	/*	write_EVENT(rank,ABT_Init_event);*/
 	
 }
 
 
 EXTERN_C int ABT_finalize_trace(int rank){
-  printf("ABT_finalize_trace %d\n",rank);
-  write_EVENT(rank,ABT_Finalize_event);
+  /*  printf("ABT_finalize_trace %d\n",rank);*/
+  /*  write_EVENT(rank,ABT_Finalize_event);*/
 	write_END_PROCESSING(rank);
 	write_log_footer(rank);
 	writeToDisk(rank);
@@ -257,7 +262,7 @@ void add_BEGIN_PROCESSING_ABT(int rank, int tid){
         int numPerfCounts = 0;
 
         trace_handle_arr[rank].recentSourceLocation = entry;
-        int numWritten=sprintf(trace_handle_arr[rank].curr_buf_position, "%d %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", BEGIN_PROCESSING, mtype, entry, time, event, rank, 0, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
+        int numWritten=snprintf(trace_handle_arr[rank].curr_buf_position, 80, "%d %d %d %ld %d %d %d %ld %d %d %d %d %ld %d\n", BEGIN_PROCESSING, mtype, entry, time, event, rank, 0, recvTime, id0, id1, id2, id3, cpuStartTime, numPerfCounts );
         trace_handle_arr[rank].curr_buf_position += numWritten;
         trace_handle_arr[rank].records_since_flush ++;
         flush(rank);
@@ -312,13 +317,13 @@ void write_END_PROCESSING(int rank){
 
 void write_END_PROCESSING_ABT(int rank, int tid){
 	int mtype = 0;
-	int entry = trace_handle_arr[rank].recentSourceLocation; // Must match for NoiseMiner to match with previous BEGIN_PROCESSING
+	int entry = tid; // Must match for NoiseMiner to match with previous BEGIN_PROCESSING
 	long time = time_us(ABT_get_wtime());
 	int event = 0;
 	int msglen = 0;
 	long cpuEndTime = 0;
 	int numPerfCounts = 0;
-	int numWritten = sprintf(trace_handle_arr[rank].curr_buf_position, "%d %d %d %ld %d %d %d %ld %d\n", END_PROCESSING, mtype, entry, time, event, rank, msglen, cpuEndTime, numPerfCounts );	
+	int numWritten = snprintf(trace_handle_arr[rank].curr_buf_position, 80, "%d %d %d %ld %d %d %d %ld %d\n", END_PROCESSING, mtype, entry, time, event, rank, msglen, cpuEndTime, numPerfCounts );	
 	trace_handle_arr[rank].curr_buf_position += numWritten;
 	trace_handle_arr[rank].records_since_flush ++;
 	flush(rank);
