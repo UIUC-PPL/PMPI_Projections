@@ -3,9 +3,11 @@
 # ------------------------------------------------
 # Enable one of the following files. 
 # For MPI 1 routines: 
-MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
+#MPI_PROTOTYPES_FILE = mpi.h-v1-sanitized
 # For MPI 2 routines: 
 #MPI_PROTOTYPES_FILE = mpi.h-v2-sanitized
+# For MPI 3 routines:
+MPI_PROTOTYPES_FILE = mpi.h-v3-constified
 # ------------------------------------------------
 
 
